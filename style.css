@@ -71,7 +71,7 @@ body {
 .logo-container {
     width: 140px;
     height: 140px;
-    margin-bottom: 8px;
+    margin: 0 auto 8px auto;
     border-radius: 50%;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
@@ -79,16 +79,23 @@ body {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     
-    /* CORREÇÃO AQUI: Garante que as pontas quadradas da imagem sejam cortadas */
+    /* FIXES PRO WEBKIT (IPHONE) */
     overflow: hidden; 
-    /* O padding foi removido para a imagem encostar nas bordas circulares */
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    transform: translateZ(0); /* Força renderização do crop */
 }
 
 .logo-container img {
     width: 100%;
     height: 100%;
-    /* CORREÇÃO AQUI: Faz a imagem preencher 100% do círculo perfeito */
-    object-fit: cover; 
+    object-fit: cover;
+    /* FIX PRINCIPAL: Bordas diretamente na imagem */
+    border-radius: 50%; 
+    display: block;
 }
 
 h1 {
