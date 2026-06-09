@@ -1,113 +1,233 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyLab | Assistência Técnica & Performance</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- SEO Meta Tags -->
+  <title>SkyLab Assistência Técnica | Manutenção de Smartphones & PCs em Belo Horizonte</title>
+  <meta name="description" content="SkyLab - Assistência Técnica Especializada em Belo Horizonte. Manutenção de smartphones, montagem de PCs de alta performance, formatação e otimização de sistemas. Atendimento rápido e transparente." />
+  <meta name="keywords" content="assistência técnica, manutenção smartphone, montagem de PC, formatação, Belo Horizonte, SkyLab" />
+  <meta name="author" content="SkyLab Assistência Técnica" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="SkyLab Assistência Técnica | Belo Horizonte" />
+  <meta property="og:description" content="Tecnologia e Performance em Alta Velocidade. Assistência técnica especializada, montagem de PCs de alta performance e soluções em BH." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  
+  <!-- Favicon placeholder (pode ser a logo) -->
+  <link rel="icon" type="image/x-icon" href="logo-skylab.jpg" />
+  
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-    <canvas id="particle-canvas"></canvas>
-
-    <main class="container">
-        
-        <header class="hero">
-            <div class="logo-container">
-                <img src="img/skylabteclogo.png" alt="SkyLab Logo">
-            </div>
-            <h1>Tecnologia e Performance em Alta Velocidade.</h1>
-            <p class="subtitle">Assistência Técnica Especializada, Montagem de Alto Desempenho e Soluções em Belo Horizonte.</p>
-        </header>
-
-        <section class="links-section">
-            <a href="https://wa.me/5531991612724" target="_blank" class="btn btn-primary">
-                <i class="fab fa-whatsapp"></i> Falar com um Técnico
-            </a>
-            <a href="#" class="btn btn-glass">
-                <i class="fas fa-file-invoice-dollar"></i> Solicitar Orçamento Online
-            </a>
-            <a href="https://instagram.com/skylabtec" target="_blank" class="btn btn-glass">
-                <i class="fab fa-instagram"></i> Nosso Instagram
-            </a>
-        </section>
-
-        <section class="services-section">
-            <h2 class="section-title">Nossa Expertise</h2>
-            <div class="services-grid">
-                
-                <div class="service-card" data-tilt>
-                    <i class="fas fa-mobile-alt service-icon"></i>
-                    <h3>Smartphones & Dispositivos</h3>
-                    <p>Manutenção ágil, troca de telas originais e substituição de baterias com garantia.</p>
-                </div>
-                
-                <div class="service-card" data-tilt>
-                    <i class="fas fa-microchip service-icon"></i>
-                    <h3>Hardware & PC Builder</h3>
-                    <p>Montagem de PCs de alta performance, setups com Intel Xeon, cable management e upgrades.</p>
-                </div>
-                
-                <div class="service-card" data-tilt>
-                    <i class="fab fa-linux service-icon"></i>
-                    <h3>Sistemas & Otimização</h3>
-                    <p>Instalação de Windows/Linux Mint, formatação segura, remoção de vírus e backup completo.</p>
-                </div>
-                
-                <div class="service-card" data-tilt>
-                    <i class="fas fa-tools service-icon"></i>
-                    <h3>Manutenção Preventiva</h3>
-                    <p>Limpeza interna profunda, troca de pasta térmica premium e diagnóstico avançado.</p>
-                </div>
-
-            </div>
-        </section>
-
-        <section class="features">
-            <div class="feature-item">
-                <div class="feature-icon-box"><i class="fas fa-rocket"></i></div>
-                <div class="feature-text">
-                    <h4>Velocidade de Foguete</h4>
-                    <p>Agilidade na entrega sem perder a qualidade.</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon-box"><i class="fas fa-crosshairs"></i></div>
-                <div class="feature-text">
-                    <h4>Precisão Cirúrgica</h4>
-                    <p>Diagnósticos técnicos exatos e resolutivos.</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon-box"><i class="fas fa-handshake"></i></div>
-                <div class="feature-text">
-                    <h4>Transparência Total</h4>
-                    <p>Orçamentos justos e sem surpresas no final.</p>
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="social-icons">
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                <a href="#" aria-label="Localização"><i class="fas fa-map-marker-alt"></i></a>
-            </div>
-            <div class="footer-info">
-                <p>Atendendo em Belo Horizonte - MG 📍</p>
-                <p>&copy; 2026 SkyLab Assistência Técnica.<br>Todos os direitos reservados.</p>
-            </div>
-        </footer>
-
-    </main>
-
-    <script src="script.js"></script>
+  <!-- ========== AMBIENT BACKGROUND ========== -->
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+  <div class="ambient-glow ambient-glow--1" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--2" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--3" aria-hidden="true"></div>
+  <!-- ========== ANNOUNCEMENT BANNER ========== -->
+  <div class="announcement-banner" id="announcement-banner" role="banner">
+    <p>
+      🚀 <span class="highlight">Atendimento ágil</span> — Orçamento grátis, sem compromisso. Fale conosco!
+    </p>
+    <button class="close-banner" id="close-banner" aria-label="Fechar aviso">
+      ✕
+    </button>
+  </div>
+  <!-- ========== HERO SECTION ========== -->
+  <header class="hero" id="hero">
+    <div class="hero__logo-wrapper">
+      <img 
+        src="logo-skylab.jpg" 
+        alt="SkyLab Assistência Técnica - Logo" 
+        class="hero__logo"
+        width="240"
+        height="240"
+        onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%230056D2%22/><stop offset=%22100%25%22 stop-color=%22%2300A3FF%22/></linearGradient></defs><rect width=%22240%22 height=%22240%22 rx=%2230%22 fill=%22%23050B14%22/><text x=%22120%22 y=%22105%22 text-anchor=%22middle%22 font-family=%22Inter,sans-serif%22 font-weight=%22800%22 font-size=%2254%22 fill=%22url(%23g)%22>SkyLab</text><text x=%22120%22 y=%22145%22 text-anchor=%22middle%22 font-family=%22Inter,sans-serif%22 font-weight=%22400%22 font-size=%2216%22 fill=%22%23A0B0C8%22 letter-spacing=%224%22>ASSISTÊNCIA TÉCNICA</text><path d=%22M100 170 L120 155 L140 170 L135 168 L120 158 L105 168 Z%22 fill=%22%2300A3FF%22 opacity=%220.6%22/></svg>'"
+      />
+    </div>
+    <div class="hero__content">
+      <span class="hero__badge" aria-label="Localização">
+        <!-- Location pin icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Belo Horizonte – MG
+      </span>
+      <h1 class="hero__title">
+        Tecnologia e Performance em <span class="gradient-text">Alta Velocidade.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Assistência Técnica Especializada, Montagem de Alto Desempenho e Soluções em Belo Horizonte.
+      </p>
+      <!-- ===== CTA BUTTONS ===== -->
+      <nav class="cta-group" aria-label="Ações rápidas">
+        <!-- WhatsApp Button -->
+        <a href="https://wa.me/5531999999999?text=Olá! Gostaria de falar com um técnico da SkyLab." class="btn btn--whatsapp" id="btn-whatsapp" target="_blank" rel="noopener noreferrer">
+          <!-- WhatsApp icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Falar com um Técnico
+        </a>
+        <!-- Budget Button -->
+        <a href="https://wa.me/5531999999999?text=Olá! Gostaria de solicitar um orçamento." class="btn btn--secondary" id="btn-budget" target="_blank" rel="noopener noreferrer">
+          <!-- Clipboard icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          Solicitar Orçamento
+        </a>
+        <!-- Instagram Button -->
+        <a href="https://instagram.com/skylab" class="btn btn--tertiary" id="btn-instagram" target="_blank" rel="noopener noreferrer">
+          <!-- Instagram icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          Nosso Instagram
+        </a>
+      </nav>
+    </div>
+  </header>
+  <div class="section-divider"></div>
+  <!-- ========== SERVICES SECTION ========== -->
+  <section class="services" id="servicos" aria-labelledby="services-title">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Nossos Serviços</span>
+        <h2 class="section-title" id="services-title">Soluções Completas em Tecnologia</h2>
+        <p class="section-description">
+          Da manutenção de smartphones à montagem de PCs de alta performance.
+        </p>
+      </div>
+      <div class="services-grid stagger-children">
+        <!-- Card 1: Smartphones -->
+        <article class="service-card reveal" style="--index: 0" id="service-smartphones">
+          <div class="service-card__icon">
+            <!-- Smartphone icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h3 class="service-card__title">Smartphones & Dispositivos</h3>
+          <p class="service-card__description">
+            Troca de telas, baterias, conectores e componentes. Diagnóstico avançado com ferramentas profissionais para todas as marcas.
+          </p>
+        </article>
+        <!-- Card 2: Hardware & PC Builder -->
+        <article class="service-card reveal" style="--index: 1" id="service-hardware">
+          <div class="service-card__icon">
+            <!-- CPU/Hardware icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+          </div>
+          <h3 class="service-card__title">Hardware & PC Builder</h3>
+          <p class="service-card__description">
+            Montagem de PCs de alta performance, setups com Intel Xeon, organização de cabos premium e upgrades estratégicos.
+          </p>
+        </article>
+        <!-- Card 3: Sistemas & Otimização -->
+        <article class="service-card reveal" style="--index: 2" id="service-sistemas">
+          <div class="service-card__icon">
+            <!-- Monitor/Terminal icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          </div>
+          <h3 class="service-card__title">Sistemas & Otimização</h3>
+          <p class="service-card__description">
+            Instalação de Windows e Linux Mint, formatação, remoção de vírus e malware, backup seguro de dados e otimização total.
+          </p>
+        </article>
+        <!-- Card 4: Manutenção Preventiva -->
+        <article class="service-card reveal" style="--index: 3" id="service-manutencao">
+          <div class="service-card__icon">
+            <!-- Shield/Wrench icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3 class="service-card__title">Manutenção Preventiva</h3>
+          <p class="service-card__description">
+            Limpeza interna profissional, troca de pasta térmica, diagnóstico avançado de hardware e prevenção contra superaquecimento.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+  <div class="section-divider"></div>
+  <!-- ========== WHY SKYLAB SECTION ========== -->
+  <section class="why-skylab" id="por-que-skylab" aria-labelledby="why-title">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Diferenciais</span>
+        <h2 class="section-title" id="why-title">Por que escolher a SkyLab?</h2>
+      </div>
+      <div class="why-grid stagger-children">
+        <!-- Velocidade -->
+        <article class="why-card reveal" style="--index: 0" id="why-speed">
+          <div class="why-card__icon">
+            <!-- Rocket icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+          </div>
+          <h3 class="why-card__title">Velocidade de Foguete</h3>
+          <p class="why-card__text">
+            Diagnóstico e reparos com agilidade excepcional. Seu equipamento volta a funcionar no menor tempo possível.
+          </p>
+        </article>
+        <!-- Precisão -->
+        <article class="why-card reveal" style="--index: 1" id="why-precision">
+          <div class="why-card__icon">
+            <!-- Target icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <h3 class="why-card__title">Precisão Cirúrgica</h3>
+          <p class="why-card__text">
+            Técnicos especializados com equipamentos profissionais. Cada reparo é executado com excelência e atenção aos detalhes.
+          </p>
+        </article>
+        <!-- Transparência -->
+        <article class="why-card reveal" style="--index: 2" id="why-transparency">
+          <div class="why-card__icon">
+            <!-- Eye icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h3 class="why-card__title">Transparência Total</h3>
+          <p class="why-card__text">
+            Orçamentos justos e detalhados. Você aprova antes de iniciarmos, sem surpresas ou cobranças ocultas.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer" id="contato" role="contentinfo">
+    <div class="footer__inner">
+      <img src="logo-skylab.jpg" alt="SkyLab Logo" class="footer__logo" width="100" height="100" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22><defs><linearGradient id=%22g2%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%230056D2%22/><stop offset=%22100%25%22 stop-color=%22%2300A3FF%22/></linearGradient></defs><rect width=%22240%22 height=%22240%22 rx=%2230%22 fill=%22%23050B14%22/><text x=%22120%22 y=%22105%22 text-anchor=%22middle%22 font-family=%22Inter,sans-serif%22 font-weight=%22800%22 font-size=%2254%22 fill=%22url(%23g2)%22>SkyLab</text><text x=%22120%22 y=%22145%22 text-anchor=%22middle%22 font-family=%22Inter,sans-serif%22 font-weight=%22400%22 font-size=%2216%22 fill=%22%23A0B0C8%22 letter-spacing=%224%22>ASSISTÊNCIA TÉCNICA</text></svg>'" />
+      <div class="footer__info">
+        <p>
+          <strong>SkyLab Assistência Técnica</strong>
+        </p>
+        <p>Manutenção especializada em smartphones, computadores e sistemas.</p>
+        <span class="location">
+          <!-- Map pin icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Belo Horizonte – MG
+        </span>
+      </div>
+      <!-- Social Links -->
+      <div class="footer__socials" aria-label="Redes sociais">
+        <!-- WhatsApp -->
+        <a href="https://wa.me/5531999999999" class="social-link" id="social-whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <!-- Instagram -->
+        <a href="https://instagram.com/skylab" class="social-link" id="social-instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <!-- Facebook -->
+        <a href="#" class="social-link" id="social-facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+      </div>
+      <p class="footer__copyright">
+        © 2026 SkyLab Assistência Técnica — Todos os direitos reservados.
+      </p>
+    </div>
+  </footer>
+  <!-- ========== JAVASCRIPT ========== -->
+  <script src="script.js"></script>
 </body>
 </html>
