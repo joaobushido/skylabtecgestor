@@ -8,14 +8,13 @@
 :root{
   /* background */
   --void:#050810;
-  --deep:#0a1124;
-  --deep-2:#0d1830;
 
-  /* glass surfaces */
-  --panel:rgba(15,24,48,0.46);
-  --panel-strong:rgba(19,31,60,0.62);
+  /* glass — tuned per breakpoint below so low-end phones stay smooth */
   --border:rgba(166,206,255,0.14);
   --border-hover:rgba(79,168,255,0.45);
+  --glass-bg:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
+  --glass-blur:blur(20px) saturate(150%);
+  --orb-blur:90px;
 
   /* brand blue — lifted from the logo gradient */
   --blue-deep:#11308f;
@@ -38,7 +37,6 @@
   --f-mono:'JetBrains Mono', monospace;
 
   /* shape */
-  --r-s:10px;
   --r-m:18px;
   --r-l:28px;
 
@@ -61,9 +59,15 @@ body{
 }
 
 img{ display:block; max-width:100%; }
-a{ color:inherit; text-decoration:none; }
+
+a, button{
+  color:inherit;
+  text-decoration:none;
+  -webkit-tap-highlight-color:transparent; /* kills the gray flash Android leaves on tap */
+  touch-action:manipulation;               /* removes the 300ms tap delay on phones */
+}
 ul{ list-style:none; }
-button{ font:inherit; background:none; border:none; cursor:pointer; color:inherit; }
+button{ font:inherit; background:none; border:none; cursor:pointer; }
 .mono{ font-family:var(--f-mono); letter-spacing:.04em; }
 
 .container{
@@ -82,8 +86,9 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 
 .orb{
   position:fixed; z-index:0; border-radius:50%;
-  filter:blur(90px); pointer-events:none;
+  filter:blur(var(--orb-blur)); pointer-events:none;
   opacity:.55;
+  will-change:transform;
 }
 .orb--a{
   width:560px; height:560px; top:-180px; left:-120px;
@@ -110,19 +115,15 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
   50%{ transform:translate(-50px,40px); }
 }
 
-/* ---------- glass primitives ---------- */
-.glass-surface{
-  background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
-  backdrop-filter:blur(22px) saturate(150%);
-  -webkit-backdrop-filter:blur(22px) saturate(150%);
+/* ---------- glass surface (shared by nav, cards, panels, footer) ---------- */
+.glass{
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
-  border-radius:var(--r-m);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.10),
-    0 24px 60px -28px rgba(0,0,0,0.65);
   position:relative;
 }
-.glass-surface::before{
+.glass::before{
   content:'';
   position:absolute; inset:0;
   border-radius:inherit;
@@ -157,10 +158,9 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 }
 .banner__close{
   position:absolute; right:14px; top:50%; transform:translateY(-50%);
-  width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center;
   border-radius:50%; opacity:.8; transition:opacity .2s var(--ease), background .2s var(--ease);
 }
-.banner__close:hover{ opacity:1; background:rgba(255,255,255,.12); }
 .banner.is-hidden{ max-height:0; padding-top:0; padding-bottom:0; opacity:0; overflow:hidden; }
 
 @keyframes pulse-dot{
@@ -177,41 +177,44 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 .nav__inner{
   max-width:var(--container);
   margin-inline:auto;
-  padding:10px 14px 10px 18px;
+  padding:8px 14px 8px 18px;
   display:flex; align-items:center; gap:20px;
-  background:rgba(10,17,36,0.45);
-  backdrop-filter:blur(18px) saturate(140%);
-  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  background:rgba(10,17,36,0.5);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
   border-radius:var(--r-l);
   transition:background .35s var(--ease), box-shadow .35s var(--ease);
 }
 .nav.is-scrolled .nav__inner{
-  background:rgba(8,13,28,0.72);
+  background:rgba(8,13,28,0.78);
   box-shadow:0 18px 40px -24px rgba(0,0,0,.7);
 }
 
+/* brand lockup — the logo carries its own wordmark, so it's the whole identity here */
 .nav__brand{
-  display:flex; align-items:center; gap:9px;
-  font-family:var(--f-display); font-weight:700; font-size:1.05rem;
+  display:flex; align-items:center;
   margin-right:auto;
 }
-.nav__brand-mark{ width:30px; height:30px; border-radius:8px; object-fit:cover; }
-.nav__brand-fallback{
-  display:none; width:30px; height:30px; border-radius:8px;
-  background:linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
-  align-items:center; justify-content:center; font-size:.7rem; font-weight:800;
+.nav__brand-mark{
+  height:48px; width:auto; max-width:190px;
+  object-fit:contain;
 }
-.nav__brand-text em{ font-style:normal; color:var(--blue-bright); }
+.nav__brand-fallback{
+  display:none; align-items:center; gap:9px;
+  font-family:var(--f-display); font-weight:700; font-size:1.15rem;
+}
+.nav__brand-fallback::before{
+  content:''; width:32px; height:32px; border-radius:9px;
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
+}
 
 .nav__links{ display:flex; gap:26px; font-size:.92rem; font-weight:500; color:var(--text-2); }
 .nav__links a{ transition:color .2s var(--ease); position:relative; }
-.nav__links a:hover{ color:var(--text-1); }
 .nav__links a::after{
   content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px;
   background:var(--blue-bright); transition:width .25s var(--ease);
 }
-.nav__links a:hover::after{ width:100%; }
 
 .nav__right{ display:flex; align-items:center; gap:14px; }
 .status-pill{
@@ -236,15 +239,21 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 .nav__mobile{
   display:none;
   flex-direction:column; gap:4px;
-  max-width:var(--container); margin:8px auto 0; padding:14px 18px;
-  background:rgba(8,13,28,0.82);
-  backdrop-filter:blur(18px);
+  max-width:var(--container); margin:8px auto 0; padding:14px 16px 16px;
+  background:rgba(8,13,28,0.88);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border); border-radius:var(--r-m);
   font-size:.95rem;
 }
 .nav__mobile a{ padding:11px 4px; color:var(--text-2); border-bottom:1px solid rgba(255,255,255,.06); }
-.nav__mobile a:last-child{ border-bottom:none; margin-top:8px; }
 .nav__mobile.is-open{ display:flex; }
+
+.nav__mobile-ctas{
+  display:flex; flex-direction:column; gap:10px;
+  margin-top:14px;
+}
+.nav__mobile-ctas .btn{ width:100%; justify-content:center; }
 
 /* ---------- buttons ---------- */
 .btn{
@@ -252,38 +261,55 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
   padding:13px 22px; border-radius:999px;
   font-weight:600; font-size:.92rem;
   border:1px solid transparent;
-  transition:transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+  transition:transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
   white-space:nowrap;
 }
-.btn:active{ transform:scale(.97); }
+.btn:active{ transform:scale(.96); } /* the feedback that matters on touch */
 
 .btn--whatsapp{
   background:linear-gradient(135deg, #1fb959, var(--wa));
   color:#06140c;
-  box-shadow:0 14px 32px -14px var(--wa-glow);
+  box-shadow:0 14px 32px -16px var(--wa-glow);
 }
-.btn--whatsapp:hover{ transform:translateY(-2px); box-shadow:0 18px 38px -14px var(--wa-glow); }
 
 .btn--glass{
-  background:rgba(255,255,255,0.04);
+  background:rgba(255,255,255,0.05);
   border-color:var(--border);
   color:var(--text-1);
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
-.btn--glass:hover{ border-color:var(--border-hover); background:rgba(79,168,255,0.08); transform:translateY(-2px); }
 
 .btn--ghost{
   color:var(--text-2);
   padding:13px 18px;
 }
-.btn--ghost:hover{ color:var(--text-1); }
 
 .btn--nav{
   padding:9px 18px; font-size:.84rem;
   background:linear-gradient(135deg, var(--blue-core), var(--blue-bright));
   box-shadow:0 10px 24px -12px rgba(43,98,232,.6);
 }
-.btn--nav:hover{ transform:translateY(-1px); }
+
+/* hover-only refinements — gated behind (hover:hover) so touchscreens never
+   get a "stuck" hover state after a tap (this was the main source of the
+   janky feel on Android) */
+@media (hover:hover) and (pointer:fine){
+  .nav__links a:hover{ color:var(--text-1); }
+  .nav__links a:hover::after{ width:100%; }
+  .banner__close:hover{ opacity:1; background:rgba(255,255,255,.12); }
+  .btn--whatsapp:hover{ transform:translateY(-2px); box-shadow:0 18px 38px -16px var(--wa-glow); }
+  .btn--glass:hover{ border-color:var(--border-hover); background:rgba(79,168,255,0.1); transform:translateY(-2px); }
+  .btn--ghost:hover{ color:var(--text-1); }
+  .btn--nav:hover{ transform:translateY(-1px); }
+  .social:hover{ color:var(--blue-bright); border-color:var(--border-hover); transform:translateY(-2px); }
+  .card:hover{
+    transform:translateY(-6px);
+    border-color:var(--border-hover);
+    box-shadow:0 30px 60px -28px rgba(43,98,232,.4);
+  }
+  .card:hover::after{ opacity:1; animation:scan 1.8s ease-in-out infinite; }
+}
 
 /* ---------- hero ---------- */
 .hero{ position:relative; z-index:1; padding:88px 0 60px; }
@@ -330,9 +356,9 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 /* ---------- diagnostic panel (signature element) ---------- */
 .hero__panel{ position:relative; }
 .diag{
-  background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
-  backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
   border-radius:var(--r-l);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 30px 70px -30px rgba(0,0,0,.7);
@@ -416,13 +442,13 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 }
 .card{
   padding:28px 24px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
-  backdrop-filter:blur(20px) saturate(150%);
-  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
   border-radius:var(--r-m);
   position:relative; overflow:hidden;
-  transition:transform .4s var(--ease), border-color .4s var(--ease), box-shadow .4s var(--ease);
+  transition:transform .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
 }
 .card::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
@@ -435,12 +461,6 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
   background:linear-gradient(180deg, transparent, rgba(79,168,255,.5), transparent);
   opacity:0; transition:opacity .3s var(--ease);
 }
-.card:hover{
-  transform:translateY(-6px);
-  border-color:var(--border-hover);
-  box-shadow:0 30px 60px -28px rgba(43,98,232,.4);
-}
-.card:hover::after{ opacity:1; animation:scan 1.8s ease-in-out infinite; }
 
 .card__code{
   position:absolute; top:22px; right:24px;
@@ -461,9 +481,9 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 .why__strip{
   display:grid; grid-template-columns:repeat(3, 1fr);
   border-radius:var(--r-l);
-  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-  backdrop-filter:blur(20px) saturate(150%);
-  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
   overflow:hidden;
 }
@@ -483,18 +503,18 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 .footer__panel{
   padding:42px;
   border-radius:var(--r-l);
-  background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
-  backdrop-filter:blur(22px) saturate(150%);
-  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
 }
 .footer__main{
   display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
 }
 .footer__brand{ display:flex; align-items:center; gap:16px; }
-.footer__logo{ width:54px; height:54px; border-radius:12px; object-fit:cover; }
+.footer__logo{ width:58px; height:58px; border-radius:14px; object-fit:contain; }
 .footer__logo-fallback{
-  display:none; width:54px; height:54px; border-radius:12px;
+  display:none; width:58px; height:58px; border-radius:14px;
   background:linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
   align-items:center; justify-content:center; font-weight:800; font-family:var(--f-display);
 }
@@ -513,7 +533,6 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
   border:1px solid var(--border); color:var(--text-2);
   transition:color .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
 }
-.social:hover{ color:var(--blue-bright); border-color:var(--border-hover); transform:translateY(-2px); }
 
 .footer__copyright{ font-size:.72rem; color:var(--text-3); }
 
@@ -530,6 +549,7 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
 @media (max-width:760px){
   .nav__links, .nav__right{ display:none; }
   .nav__toggle{ display:flex; }
+  .nav__brand-mark{ height:40px; }
   .footer__main{ flex-direction:column; align-items:flex-start; }
   .footer__cta{ width:100%; justify-content:center; }
 }
@@ -539,6 +559,20 @@ button{ font:inherit; background:none; border:none; cursor:pointer; color:inheri
   .hero__title{ font-size:2.2rem; }
   .footer__panel{ padding:28px 22px; }
   .container{ padding-inline:18px; }
+}
+
+/* ---------- light-device performance pass ----------
+   Heavy backdrop-filter blur is the single biggest cost on mid-range
+   Android GPUs (e.g. Galaxy A-series). Trimming it here is what actually
+   fixes the choppy/blurry feel during scroll and taps — visually almost
+   identical, far cheaper to render. */
+@media (max-width:760px){
+  :root{
+    --glass-blur:blur(10px) saturate(130%);
+    --orb-blur:50px;
+  }
+  .orb{ opacity:.35; }
+  .orb--a, .orb--b, .orb--c{ animation-duration:42s; }
 }
 
 /* ---------- reduced motion ---------- */
@@ -552,5 +586,4 @@ a:focus-visible, button:focus-visible{
   outline:2px solid var(--blue-bright);
   outline-offset:3px;
   border-radius:6px;
-                           }
-   
+}
