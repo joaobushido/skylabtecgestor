@@ -525,22 +525,23 @@ button{ font:inherit; background:none; border:none; cursor:pointer; }
   display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
 }
 .footer__brand{ display:flex; align-items:center; gap:16px; }
-.footer__logo-frame{
-  width:50px; height:50px; min-width:50px; flex-shrink:0;
-  border-radius:50%;
-  border:1px solid var(--border);
-  overflow:hidden;
-  position:relative;
-}
+.footer__logo-frame{ flex-shrink:0; }
 .footer__logo{
-  position:absolute; inset:0;
-  width:50px; height:50px;
+  display:block;
+  width:48px;
+  height:48px;
+  border-radius:50%;
   object-fit:cover;
+  border:2px solid rgba(79,168,255,0.35);
 }
 .footer__logo-fallback{
-  display:none; position:absolute; inset:0;
+  display:none;
+  width:48px; height:48px; border-radius:50%;
   background:linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
-  align-items:center; justify-content:center; font-weight:800; font-family:var(--f-display);
+  align-items:center; justify-content:center;
+  font-weight:800; font-family:var(--f-display);
+  font-size:.8rem; color:#fff;
+  border:2px solid rgba(79,168,255,0.35);
 }
 .footer__brand-name{ font-family:var(--f-display); font-weight:700; font-size:1.08rem; margin-bottom:4px; }
 .footer__brand-text{ font-size:.86rem; color:var(--text-2); }
