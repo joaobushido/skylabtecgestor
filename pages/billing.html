@@ -7,6 +7,23 @@
   <meta name="description" content="Controle financeiro completo da sua assistência técnica com o SkyLab TecGestor." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* Estilos da tabela e badges */
+    .table-wrapper { overflow-x: auto; width: 100%; }
+    .os-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .os-table th { padding: 16px 12px; color: var(--text-2); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .os-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); font-size: 0.95rem; }
+    .os-table tr:hover td { background: rgba(255,255,255,0.02); }
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge--Pendente { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .badge--Pago { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .badge--Atrasado { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .action-btn:hover { background: var(--border); color: var(--text-1); }
+    .action-btn--danger:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+  </style>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -26,7 +43,7 @@
         <a href="../home.html">Dashboard</a>
         <a href="technical-control.html">Reparos</a>
         <a href="inventory.html">Estoque</a>
-        <a href="billing.html">Financeiro</a>
+        <a href="billing.html" style="color:var(--text-1); font-weight:600;">Financeiro</a>
       </div>
       <div class="nav__right">
         <a href="../home.html" class="btn btn--nav">← Voltar</a>
@@ -46,41 +63,40 @@
 
   <div class="page-content">
     <div class="container">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Gestão de Cobranças</h1>
-        <p class="page-header__desc">Controle financeiro completo da sua assistência técnica.</p>
-      </div>
-
-      <div class="placeholder-card reveal" style="--index:1">
-        <div class="placeholder-card__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-            <line x1="1" y1="10" x2="23" y2="10"/>
-          </svg>
+      <div class="page-header reveal" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h1 class="page-header__title">Gestão de Cobranças</h1>
+          <p class="page-header__desc">Controle de recebimentos, fiados e serviços prestados.</p>
         </div>
-        <h2 class="placeholder-card__title">Financeiro & Cobranças</h2>
-        <p class="placeholder-card__desc">Conecte ao Firebase para gerenciar cobranças, clientes, pagamentos pendentes e relatórios financeiros.</p>
-        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
+        <button id="btn-new-billing" class="btn btn--primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova Cobrança
+        </button>
       </div>
 
-      <!-- ═══════════════════════════════════════════
-           🔥 FIREBASE: Billing CRUD
-           Coleção: users/{uid}/billing
-           
-           Imports necessários:
-           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
-             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-           
-           Exemplo de leitura:
-           const snap = await getDocs(collection(db, "users", user.uid, "billing"));
-           snap.forEach(doc => { console.log(doc.id, doc.data()); });
-           
-           Exemplo de escrita:
-           await addDoc(collection(db, "users", user.uid, "billing"), {
-             // campos do documento
-             createdAt: serverTimestamp()
-           });
-           ═══════════════════════════════════════════ -->
+      <div class="card reveal" style="--index:1; margin-top: 24px; padding: 0;">
+        <div class="table-wrapper">
+          <table class="os-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Descrição</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Valor</th>
+                <th style="text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="billing-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-3);">
+                  Carregando Financeiro...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -88,22 +104,175 @@
     <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
   </footer>
 
-  <script>
-    // Nav scroll
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
-    // Mobile toggle
-    const toggle = document.getElementById('navToggle');
-    const mobile = document.getElementById('navMobile');
-    toggle?.addEventListener('click', () => {
-      mobile.classList.toggle('is-open');
-      toggle.classList.toggle('is-active');
+  <div id="billing-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px; width: 100%;">
+      <div class="modal__edit-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 id="modal-title" style="margin:0; font-size:1.1rem; color:var(--text-1);">Nova Cobrança</h3>
+        <button id="btn-close-modal" class="modal__close" style="position:static; margin:0; padding:4px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <form id="billing-form" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <input type="hidden" id="bill-id" />
+        
+        <div class="input-group" style="margin:0;">
+          <label for="bill-client">Nome do Cliente</label>
+          <input type="text" id="bill-client" class="input" placeholder="Ex: Maria Oliveira" required />
+        </div>
+        
+        <div class="input-group" style="margin:0;">
+          <label for="bill-desc">Descrição / Serviço</label>
+          <input type="text" id="bill-desc" class="input" placeholder="Ex: Reparo de Placa - Galaxy S22" required />
+        </div>
+
+        <div style="display:flex; gap:16px;">
+          <div class="input-group" style="margin:0; flex:1;">
+            <label for="bill-date">Vencimento / Data</label>
+            <input type="date" id="bill-date" class="input" required />
+          </div>
+          <div class="input-group" style="margin:0; flex:1;">
+            <label for="bill-status">Status</label>
+            <select id="bill-status" class="input" required>
+              <option value="Pendente">Pendente (A receber)</option>
+              <option value="Pago">Pago</option>
+              <option value="Atrasado">Atrasado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group" style="margin:0;">
+          <label for="bill-amount">Valor (R$)</label>
+          <input type="number" id="bill-amount" class="input" placeholder="0.00" step="0.01" min="0" required />
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" id="btn-cancel-modal" class="btn btn--ghost">Cancelar</button>
+          <button type="submit" id="btn-save-bill" class="btn btn--primary">Salvar Registro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og",
+      authDomain: "tecgestor-skylab.firebaseapp.com",
+      projectId: "tecgestor-skylab",
+      storageBucket: "tecgestor-skylab.firebasestorage.app",
+      messagingSenderId: "512077747740",
+      appId: "1:512077747740:web:80bbef846cb4395f9ab1d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "../index.html";
+      else { currentUser = user; listenToBilling(); }
     });
-    // Reveal
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
-    }), { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    const tbody = document.getElementById('billing-tbody');
+    const modal = document.getElementById('billing-modal');
+    const form = document.getElementById('billing-form');
+    const modalTitle = document.getElementById('modal-title');
+
+    function formatMoney(value) {
+      if (!value) return "R$ 0,00";
+      return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function formatDateToBR(dateStr) {
+      if (!dateStr) return "-";
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    function listenToBilling() {
+      const q = query(collection(db, "users", currentUser.uid, "billing"), orderBy("date", "desc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-3);">Nenhuma cobrança registrada.</td></tr>`;
+          return;
+        }
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const bill = docSnap.data();
+          const id = docSnap.id;
+          const badgeClass = `badge--${bill.status}`;
+          
+          html += `
+            <tr>
+              <td><strong style="color:var(--text-1);">${bill.client}</strong></td>
+              <td>${bill.desc}</td>
+              <td>${formatDateToBR(bill.date)}</td>
+              <td><span class="badge ${badgeClass}">${bill.status}</span></td>
+              <td><strong style="${bill.status === 'Pago' ? 'color:var(--emerald);' : 'color:var(--orange);'}">${formatMoney(bill.amount)}</strong></td>
+              <td style="text-align:right;">
+                <button class="action-btn" onclick="window.editBill('${id}', '${bill.client}', '${bill.desc}', '${bill.date}', '${bill.status}', '${bill.amount}')">✏️</button>
+                <button class="action-btn action-btn--danger" onclick="window.deleteBill('${id}')" style="margin-left:4px;">🗑️</button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openModal() { modal.classList.add('is-open'); }
+    function closeModal() { modal.classList.remove('is-open'); form.reset(); document.getElementById('bill-id').value = ''; }
+
+    document.getElementById('btn-new-billing').addEventListener('click', () => {
+      modalTitle.textContent = "Nova Cobrança"; closeModal(); openModal();
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+    document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('bill-id').value;
+      const data = {
+        client: document.getElementById('bill-client').value,
+        desc: document.getElementById('bill-desc').value,
+        date: document.getElementById('bill-date').value,
+        status: document.getElementById('bill-status').value,
+        amount: Number(document.getElementById('bill-amount').value)
+      };
+
+      document.getElementById('btn-save-bill').textContent = "Salvando...";
+      try {
+        if (id) await updateDoc(doc(db, "users", currentUser.uid, "billing", id), data);
+        else {
+          data.createdAt = serverTimestamp();
+          await addDoc(collection(db, "users", currentUser.uid, "billing"), data);
+        }
+        closeModal();
+      } catch (error) { alert("Erro ao salvar cobrança."); }
+      document.getElementById('btn-save-bill').textContent = "Salvar Registro";
+    });
+
+    window.editBill = (id, client, desc, date, status, amount) => {
+      modalTitle.textContent = "Editar Cobrança";
+      document.getElementById('bill-id').value = id;
+      document.getElementById('bill-client').value = client;
+      document.getElementById('bill-desc').value = desc;
+      document.getElementById('bill-date').value = date;
+      document.getElementById('bill-status').value = status;
+      document.getElementById('bill-amount').value = amount;
+      openModal();
+    };
+
+    window.deleteBill = async (id) => {
+      if (confirm("Deseja apagar este registro financeiro?")) {
+        await deleteDoc(doc(db, "users", currentUser.uid, "billing", id));
+      }
+    };
   </script>
 </body>
 </html>
