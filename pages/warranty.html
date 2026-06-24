@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Garantias</title>
+  <meta name="description" content="Acompanhe todas as garantias ativas dos seus serviços." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .w-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.w-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.w-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.w-table tr:hover td{background:rgba(255,255,255,.02)}.w-badge{padding:3px 10px;border-radius:999px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}.w-active{background:rgba(16,185,129,.12);color:var(--emerald)}.w-expiring{background:rgba(245,158,11,.12);color:var(--amber)}.w-expired{background:rgba(239,68,68,.12);color:var(--red)}.add-form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.w-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}@media(max-width:768px){.add-form{grid-template-columns:1fr}.w-table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Garantias</h1><p class="page-header__desc">Acompanhe todas as garantias ativas dos seus serviços.</p></div>
+      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Registrar Garantia</h3>
+        <form id="w-form" class="add-form">
+          <div class="input-group"><label for="w-client">Cliente</label><input type="text" id="w-client" class="input" placeholder="Nome do cliente" required/></div>
+          <div class="input-group"><label for="w-device">Aparelho</label><input type="text" id="w-device" class="input" placeholder="iPhone 14 Pro" required/></div>
+          <div class="input-group"><label for="w-os">Nº da OS</label><input type="text" id="w-os" class="input" placeholder="001"/></div>
+          <div class="input-group"><label for="w-type">Tipo de Serviço</label><input type="text" id="w-type" class="input" placeholder="Troca de tela"/></div>
+          <div class="input-group"><label for="w-start">Início</label><input type="date" id="w-start" class="input" required/></div>
+          <div class="input-group"><label for="w-end">Vencimento</label><input type="date" id="w-end" class="input" required/></div>
+          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Registrar</button></div>
+        </form>
+      </div>
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
+        <div style="padding:20px 24px 0;"><h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Garantias Registradas <span id="w-count" style="opacity:.5;margin-left:4px;"></span></h3></div>
+        <div id="w-list" style="overflow-x:auto;"><div class="w-empty">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { auth, db, doc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
+    let warranties=[];
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('pt-BR')}catch{return d}}
+
+    window.addEventListener('skylab:ready',({detail:{user}})=>{
+      const uid=user.uid, colRef=collection(db,'users',uid,'warranties');
+      // Set default dates
+      const today=new Date().toISOString().split('T')[0];
+      const end90=new Date(Date.now()+90*864e5).toISOString().split('T')[0];
+      document.getElementById('w-start').value=today;
+      document.getElementById('w-end').value=end90;
+
+      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{warranties=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
+
+      document.getElementById('w-form').addEventListener('submit',async(e)=>{
+        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
+        try{await addDoc(colRef,{client:document.getElementById('w-client').value.trim(),device:document.getElementById('w-device').value.trim(),osNumber:document.getElementById('w-os').value.trim(),type:document.getElementById('w-type').value.trim(),startDate:document.getElementById('w-start').value,endDate:document.getElementById('w-end').value,createdAt:serverTimestamp()});e.target.reset();document.getElementById('w-start').value=today;document.getElementById('w-end').value=end90;}catch(err){alert('Erro: '+err.message)}btn.disabled=false;
+      });
+    });
+
+    function getStatus(endDate){
+      if(!endDate)return{label:'Indefinida',cls:'w-active'};
+      const now=Date.now(),end=new Date(endDate).getTime(),days=Math.ceil((end-now)/864e5);
+      if(days<0)return{label:'Vencida',cls:'w-expired'};
+      if(days<=7)return{label:`${days}d restante(s)`,cls:'w-expiring'};
+      return{label:'Ativa',cls:'w-active'};
+    }
+
+    function render(){
+      const el=document.getElementById('w-list');
+      document.getElementById('w-count').textContent=`(${warranties.length})`;
+      if(!warranties.length){el.innerHTML='<div class="w-empty">Nenhuma garantia registrada.</div>';return;}
+      el.innerHTML=`<table class="w-table"><thead><tr><th>Cliente</th><th>Aparelho</th><th>OS</th><th>Serviço</th><th>Início</th><th>Vencimento</th><th>Status</th><th></th></tr></thead><tbody>${warranties.map(w=>{const st=getStatus(w.endDate);return`<tr><td style="color:var(--text-1);font-weight:600;">${esc(w.client)}</td><td>${esc(w.device)}</td><td style="font-family:var(--f-mono);">#${esc(w.osNumber)}</td><td>${esc(w.type)}</td><td>${fmtDate(w.startDate)}</td><td>${fmtDate(w.endDate)}</td><td><span class="w-badge ${st.cls}">${st.label}</span></td><td><button class="act-btn" onclick="window.__delW('${w.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td></tr>`}).join('')}</tbody></table>`;
+    }
+    window.__delW=async(id)=>{if(!confirm('Excluir garantia?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'warranties',id))}catch(e){console.error(e)}};
+  </script>
+</body>
+</html>

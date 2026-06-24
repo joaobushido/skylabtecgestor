@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Análise Detalhada</title>
+  <meta name="description" content="Visualize o crescimento e performance da sua loja." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:24px}.stat-card{padding:24px;border-radius:var(--r-m);display:flex;align-items:center;gap:16px}.stat-card__icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.stat-card__icon svg{width:24px;height:24px}.stat-card__info{flex:1;min-width:0}.stat-card__label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3)}.stat-card__value{font-size:1.8rem;font-weight:900;font-family:var(--f-mono);margin-top:4px}.stat-card__sub{font-size:.75rem;color:var(--text-3);margin-top:2px}
+    .sc-blue{background:rgba(43,98,232,.06);border:1px solid rgba(43,98,232,.12)}.sc-blue .stat-card__icon{background:rgba(43,98,232,.12);color:var(--blue-bright)}.sc-blue .stat-card__value{color:var(--blue-bright)}
+    .sc-green{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.12)}.sc-green .stat-card__icon{background:rgba(16,185,129,.12);color:var(--emerald)}.sc-green .stat-card__value{color:var(--emerald)}
+    .sc-purple{background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.12)}.sc-purple .stat-card__icon{background:rgba(139,92,246,.12);color:var(--purple)}.sc-purple .stat-card__value{color:var(--purple)}
+    .sc-orange{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.12)}.sc-orange .stat-card__icon{background:rgba(249,115,22,.12);color:var(--orange)}.sc-orange .stat-card__value{color:var(--orange)}
+    .sc-red{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.12)}.sc-red .stat-card__icon{background:rgba(239,68,68,.12);color:var(--red)}.sc-red .stat-card__value{color:var(--red)}
+    .sc-cyan{background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12)}.sc-cyan .stat-card__icon{background:rgba(6,182,212,.12);color:var(--cyan)}.sc-cyan .stat-card__value{color:var(--cyan)}
+    .loading-text{text-align:center;padding:60px;color:var(--text-3);font-size:.88rem}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Análise Detalhada</h1><p class="page-header__desc">Visualize o crescimento e performance da sua loja.</p></div>
+      <div id="stats-container"><div class="loading-text">Carregando dados...</div></div>
+    </div>
+  </div>
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { db, collection, getDocs } from './page-init.js';
+    function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+    window.addEventListener('skylab:ready',async({detail:{user}})=>{
+      const uid=user.uid;
+      try{
+        const[svcSnap,salesSnap,invSnap,billSnap,warSnap]=await Promise.all([
+          getDocs(collection(db,'users',uid,'services')),
+          getDocs(collection(db,'users',uid,'sales')),
+          getDocs(collection(db,'users',uid,'inventory')),
+          getDocs(collection(db,'users',uid,'billing')),
+          getDocs(collection(db,'users',uid,'warranties')),
+        ]);
+        const services=svcSnap.docs.map(d=>d.data());
+        const sales=salesSnap.docs.map(d=>d.data());
+        const inventory=invSnap.docs.map(d=>d.data());
+        const billing=billSnap.docs.map(d=>d.data());
+        const warranties=warSnap.docs.map(d=>d.data());
+
+        const totalServices=services.length;
+        const svcRevenue=services.reduce((a,s)=>a+(s.price||0),0);
+        const totalSales=sales.length;
+        const salesRevenue=sales.reduce((a,s)=>a+(s.price||0),0);
+        const invCount=inventory.length;
+        const lowStock=inventory.filter(i=>(parseInt(i.quantity)||0)<=2).length;
+        const billingPending=billing.filter(b=>(b.status||'').toLowerCase()==='pendente').reduce((a,b)=>a+(b.amount||0),0);
+        const billingPaid=billing.filter(b=>(b.status||'').toLowerCase()==='pago').reduce((a,b)=>a+(b.amount||0),0);
+        const activeWarranties=warranties.filter(w=>{if(!w.endDate)return false;return new Date(w.endDate).getTime()>Date.now()}).length;
+        const completedServices=services.filter(s=>(s.status||'').toLowerCase().includes('conclu')).length;
+
+        document.getElementById('stats-container').innerHTML=`
+          <div class="stats-grid reveal" style="--index:1">
+            <div class="stat-card sc-blue"><div class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg></div><div class="stat-card__info"><div class="stat-card__label">Total de Serviços</div><div class="stat-card__value">${totalServices}</div><div class="stat-card__sub">${completedServices} concluído(s)</div></div></div>
+            <div class="stat-card sc-green"><div class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div><div class="stat-card__info"><div class="stat-card__label">Receita Serviços</div><div class="stat-card__value">${fmtMoney(svcRevenue)}</div><div class="stat-card__sub">De ${totalServices} OS</div></div></div>
+            <div class="stat-card sc-cyan"><div class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><div class="stat-card__info"><div class="stat-card__label">Vendas</div><div class="stat-card__value">${totalSales}</div><div class="stat-card__sub">${fmtMoney(salesRevenue)} faturado</div></div></div>
+            <div class="stat-card sc-purple"><div class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="stat-card__info"><div class="stat-card__label">Itens em Estoque</div><div class="stat-card__value">${invCount}</div><div class="stat-card__sub">${lowStock>0?'<span style="color:var(--red)">'+lowStock+' com estoque baixo</span>':'Estoque saudável'}</div></div></div>
+            <div class="stat-card sc-orange"><div class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg></div><div class="stat-card__info"><div class="stat-card__label">Cobranças Pendentes</div><div class="stat-card__value">${fmtMoney(billingPending)}</div><div class="stat-card__sub">${fmtMoney(billingPaid)} já recebido</div></div></div>
+            <div class="stat-card sc-green"><div class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div><div class="stat-card__info"><div class="stat-card__label">Garantias Ativas</div><div class="stat-card__value">${activeWarranties}</div><div class="stat-card__sub">De ${warranties.length} registrada(s)</div></div></div>
+          </div>`;
+        // Trigger reveal
+        const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('is-visible');obs.unobserve(x.target)}}),{threshold:.1});
+        document.querySelectorAll('.reveal:not(.is-visible)').forEach(el=>obs.observe(el));
+      }catch(e){console.error('Analytics load error:',e);document.getElementById('stats-container').innerHTML='<div class="loading-text">Erro ao carregar dados.</div>';}
+    });
+  </script>
+</body>
+</html>

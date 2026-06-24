@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Gestão de Cobranças</title>
+  <meta name="description" content="Controle financeiro completo da sua assistência técnica." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}.summary-card{padding:20px;border-radius:var(--r-m);text-align:center}.summary-card h4{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:8px}.summary-card .val{font-size:1.6rem;font-weight:900;font-family:var(--f-mono)}.sc-pending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)}.sc-pending .val{color:var(--amber)}.sc-paid{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)}.sc-paid .val{color:var(--emerald)}.sc-late{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15)}.sc-late .val{color:var(--red)}.b-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.b-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.b-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.b-table tr:hover td{background:rgba(255,255,255,.02)}.b-badge{padding:3px 10px;border-radius:999px;font-size:.65rem;font-weight:700;text-transform:uppercase;cursor:pointer}.b-pending{background:rgba(245,158,11,.12);color:var(--amber)}.b-paid{background:rgba(16,185,129,.12);color:var(--emerald)}.b-late{background:rgba(239,68,68,.12);color:var(--red)}.add-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.b-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}@media(max-width:768px){.add-form,.summary-grid{grid-template-columns:1fr}.b-table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html" style="color:var(--text-1)">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Gestão de Cobranças</h1><p class="page-header__desc">Controle financeiro completo da sua assistência técnica.</p></div>
+      <div class="summary-grid reveal" style="--index:1">
+        <div class="summary-card sc-pending"><h4>Pendente</h4><div class="val" id="sum-pending">R$ 0,00</div></div>
+        <div class="summary-card sc-paid"><h4>Recebido</h4><div class="val" id="sum-paid">R$ 0,00</div></div>
+        <div class="summary-card sc-late"><h4>Atrasado</h4><div class="val" id="sum-late">R$ 0,00</div></div>
+      </div>
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Nova Cobrança</h3>
+        <form id="b-form" class="add-form">
+          <div class="input-group"><label for="b-client">Cliente</label><input type="text" id="b-client" class="input" placeholder="Nome do cliente" required/></div>
+          <div class="input-group"><label for="b-desc">Descrição</label><input type="text" id="b-desc" class="input" placeholder="Troca de tela iPhone 14"/></div>
+          <div class="input-group"><label for="b-amount">Valor (R$)</label><input type="number" id="b-amount" class="input" placeholder="350.00" step="0.01" min="0" required/></div>
+          <div class="input-group"><label for="b-due">Vencimento</label><input type="date" id="b-due" class="input"/></div>
+          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Adicionar</button></div>
+        </form>
+      </div>
+      <div class="card reveal" style="--index:3;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
+        <div style="padding:20px 24px 0;"><h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Cobranças <span id="b-count" style="opacity:.5;margin-left:4px;"></span></h3></div>
+        <div id="b-list" style="overflow-x:auto;"><div class="b-empty">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { auth, db, doc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
+    let bills=[];
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('pt-BR')}catch{return d}}
+    function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+    window.addEventListener('skylab:ready',({detail:{user}})=>{
+      const uid=user.uid,colRef=collection(db,'users',uid,'billing');
+      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{bills=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
+      document.getElementById('b-form').addEventListener('submit',async(e)=>{
+        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
+        try{await addDoc(colRef,{client:document.getElementById('b-client').value.trim(),description:document.getElementById('b-desc').value.trim(),amount:parseFloat(document.getElementById('b-amount').value)||0,dueDate:document.getElementById('b-due').value,status:'Pendente',createdAt:serverTimestamp()});e.target.reset()}catch(err){alert('Erro: '+err.message)}btn.disabled=false;
+      });
+    });
+
+    function badgeCls(s){const l=(s||'').toLowerCase();if(l==='pago')return'b-paid';if(l==='atrasado')return'b-late';return'b-pending'}
+    const STATUSES=['Pendente','Pago','Atrasado'];
+
+    function render(){
+      const el=document.getElementById('b-list');
+      document.getElementById('b-count').textContent=`(${bills.length})`;
+      let pending=0,paid=0,late=0;
+      bills.forEach(b=>{const a=b.amount||0;const s=(b.status||'').toLowerCase();if(s==='pago')paid+=a;else if(s==='atrasado')late+=a;else pending+=a});
+      document.getElementById('sum-pending').textContent=fmtMoney(pending);
+      document.getElementById('sum-paid').textContent=fmtMoney(paid);
+      document.getElementById('sum-late').textContent=fmtMoney(late);
+      if(!bills.length){el.innerHTML='<div class="b-empty">Nenhuma cobrança cadastrada.</div>';return}
+      el.innerHTML=`<table class="b-table"><thead><tr><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Status</th><th></th></tr></thead><tbody>${bills.map(b=>`<tr><td style="color:var(--text-1);font-weight:600;">${esc(b.client)}</td><td>${esc(b.description)}</td><td style="font-family:var(--f-mono);">${fmtMoney(b.amount)}</td><td>${fmtDate(b.dueDate)}</td><td><span class="b-badge ${badgeCls(b.status)}" onclick="window.__cycleB('${b.id}')" title="Clique para alterar">${esc(b.status||'Pendente')}</span></td><td><button class="act-btn" onclick="window.__delB('${b.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td></tr>`).join('')}</tbody></table>`;
+    }
+    window.__cycleB=async(id)=>{const b=bills.find(x=>x.id===id);if(!b)return;const idx=STATUSES.indexOf(b.status);const next=STATUSES[(idx+1)%STATUSES.length];try{const u=auth.currentUser;if(u)await updateDoc(doc(db,'users',u.uid,'billing',id),{status:next,updatedAt:serverTimestamp()})}catch(e){console.error(e)}};
+    window.__delB=async(id)=>{if(!confirm('Excluir cobrança?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'billing',id))}catch(e){console.error(e)}};
+  </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Orçamentos</title>
+  <meta name="description" content="Crie e gerencie orçamentos para seus clientes." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .q-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.q-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.q-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.q-table tr:hover td{background:rgba(255,255,255,.02)}.q-badge{padding:3px 10px;border-radius:999px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;white-space:nowrap}.q-pending{background:rgba(245,158,11,.12);color:var(--amber)}.q-approved{background:rgba(16,185,129,.12);color:var(--emerald)}.q-rejected{background:rgba(239,68,68,.12);color:var(--red)}.add-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.q-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}@media(max-width:768px){.add-form{grid-template-columns:1fr}.q-table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Orçamentos</h1><p class="page-header__desc">Crie e gerencie orçamentos para seus clientes.</p></div>
+
+      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Novo Orçamento</h3>
+        <form id="q-form" class="add-form">
+          <div class="input-group"><label for="q-client">Cliente</label><input type="text" id="q-client" class="input" placeholder="Nome do cliente" required/></div>
+          <div class="input-group"><label for="q-phone">Telefone / WhatsApp</label><input type="tel" id="q-phone" class="input" placeholder="(00) 00000-0000"/></div>
+          <div class="input-group add-form--full"><label for="q-items">Descrição dos Itens</label><textarea id="q-items" class="input" rows="3" placeholder="1x Troca de tela iPhone 14 - R$ 350&#10;1x Película hidrogel - R$ 30" required style="resize:vertical;min-height:80px;"></textarea></div>
+          <div class="input-group"><label for="q-total">Valor Total (R$)</label><input type="number" id="q-total" class="input" placeholder="380.00" step="0.01" min="0" required/></div>
+          <div class="input-group"><label for="q-validity">Validade (dias)</label><input type="number" id="q-validity" class="input" placeholder="7" min="1" value="7"/></div>
+          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Criar Orçamento</button></div>
+        </form>
+      </div>
+
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
+        <div style="padding:20px 24px 0;"><h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Orçamentos <span id="q-count" style="opacity:.5;margin-left:4px;"></span></h3></div>
+        <div id="q-list" style="overflow-x:auto;"><div class="q-empty">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { auth, db, doc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, Timestamp } from './page-init.js';
+    let quotes=[];
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+    function fmtDate(ts){if(!ts)return'—';try{const d=ts instanceof Timestamp?ts.toDate():new Date(ts);return d.toLocaleDateString('pt-BR')}catch{return'—'}}
+
+    window.addEventListener('skylab:ready',({detail:{user}})=>{
+      const uid=user.uid,colRef=collection(db,'users',uid,'quotes');
+      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{quotes=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
+
+      document.getElementById('q-form').addEventListener('submit',async(e)=>{
+        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
+        try{
+          await addDoc(colRef,{
+            client:document.getElementById('q-client').value.trim(),
+            phone:document.getElementById('q-phone').value.trim(),
+            items:document.getElementById('q-items').value.trim(),
+            total:parseFloat(document.getElementById('q-total').value)||0,
+            validityDays:parseInt(document.getElementById('q-validity').value)||7,
+            status:'Pendente',
+            createdAt:serverTimestamp()
+          });
+          e.target.reset();document.getElementById('q-validity').value='7';
+        }catch(err){alert('Erro: '+err.message)}
+        btn.disabled=false;
+      });
+    });
+
+    const STATUSES=['Pendente','Aprovado','Recusado'];
+    function badgeCls(s){const l=(s||'').toLowerCase();if(l==='aprovado')return'q-approved';if(l==='recusado')return'q-rejected';return'q-pending'}
+
+    function render(){
+      const el=document.getElementById('q-list');
+      document.getElementById('q-count').textContent=`(${quotes.length})`;
+      if(!quotes.length){el.innerHTML='<div class="q-empty">Nenhum orçamento cadastrado.</div>';return}
+      el.innerHTML=`<table class="q-table"><thead><tr><th>Cliente</th><th>Telefone</th><th>Itens</th><th>Total</th><th>Data</th><th>Status</th><th></th></tr></thead><tbody>${quotes.map(q=>`<tr>
+        <td style="color:var(--text-1);font-weight:600;">${esc(q.client)}</td>
+        <td style="font-size:.82rem;">${esc(q.phone)}</td>
+        <td style="max-width:200px;white-space:pre-line;font-size:.78rem;">${esc(q.items)}</td>
+        <td style="font-family:var(--f-mono);font-weight:700;">${fmtMoney(q.total)}</td>
+        <td style="font-size:.78rem;">${fmtDate(q.createdAt)}</td>
+        <td><span class="q-badge ${badgeCls(q.status)}" onclick="window.__cycleQ('${q.id}')" title="Clique para alterar">${esc(q.status||'Pendente')}</span></td>
+        <td style="display:flex;gap:4px;">
+          ${q.phone?`<button class="act-btn" onclick="window.open('https://wa.me/55'+('${esc(q.phone)}').replace(/\\D/g,'')+'?text='+encodeURIComponent('Olá! Segue seu orçamento:\\n\\n'+decodeURIComponent('${encodeURIComponent(q.items||'')}')+'\\n\\nTotal: ${fmtMoney(q.total)}'))" title="Enviar via WhatsApp" style="color:var(--emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg></button>`:''}
+          <button class="act-btn" onclick="window.__delQ('${q.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+        </td>
+      </tr>`).join('')}</tbody></table>`;
+    }
+
+    window.__cycleQ=async(id)=>{const q=quotes.find(x=>x.id===id);if(!q)return;const idx=STATUSES.indexOf(q.status);const next=STATUSES[(idx+1)%STATUSES.length];try{const u=auth.currentUser;if(u)await updateDoc(doc(db,'users',u.uid,'quotes',id),{status:next,updatedAt:serverTimestamp()})}catch(e){console.error(e)}};
+    window.__delQ=async(id)=>{if(!confirm('Excluir orçamento?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'quotes',id))}catch(e){console.error(e)}};
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Configurações</title>
+  <meta name="description" content="Personalize o sistema de acordo com suas necessidades." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .settings-form{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.settings-form--full{grid-column:1/-1}.user-info{display:flex;align-items:center;gap:16px;padding:20px;border-radius:var(--r-m);background:rgba(43,98,232,.06);border:1px solid rgba(43,98,232,.12);margin-top:24px}.user-avatar{width:48px;height:48px;border-radius:50%;background:rgba(43,98,232,.2);display:flex;align-items:center;justify-content:center;color:var(--blue-bright);font-weight:800;font-size:1.1rem;overflow:hidden}.user-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}.user-details{flex:1;min-width:0}.user-name{font-weight:700;color:var(--text-1);font-size:.95rem}.user-email{font-size:.78rem;color:var(--text-3);margin-top:2px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);padding:14px 28px;border-radius:var(--r-m);background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--emerald);font-weight:700;font-size:.85rem;z-index:9999;transition:transform .4s var(--ease);backdrop-filter:blur(12px)}.toast.show{transform:translateX(-50%) translateY(0)}@media(max-width:768px){.settings-form{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:700px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Configurações</h1><p class="page-header__desc">Personalize o sistema de acordo com suas necessidades.</p></div>
+
+      <!-- User Info -->
+      <div class="user-info reveal" style="--index:1" id="user-info">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-details">
+          <div class="user-name" id="user-display-name">Carregando...</div>
+          <div class="user-email" id="user-email">—</div>
+        </div>
+      </div>
+
+      <!-- Settings Form -->
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:20px;">Dados da Loja</h3>
+        <form id="settings-form" class="settings-form">
+          <div class="input-group"><label for="store-name">Nome da Loja</label><input type="text" id="store-name" class="input" placeholder="SkyLab Assistência Técnica"/></div>
+          <div class="input-group"><label for="store-phone">Telefone / WhatsApp</label><input type="tel" id="store-phone" class="input" placeholder="(00) 00000-0000"/></div>
+          <div class="input-group settings-form--full"><label for="store-address">Endereço</label><input type="text" id="store-address" class="input" placeholder="Rua, número, bairro, cidade"/></div>
+          <div class="input-group"><label for="work-hours-open">Horário de Abertura</label><input type="time" id="work-hours-open" class="input" value="08:00"/></div>
+          <div class="input-group"><label for="work-hours-close">Horário de Fechamento</label><input type="time" id="work-hours-close" class="input" value="18:00"/></div>
+          <div class="input-group"><label for="pix-key">Chave PIX</label><input type="text" id="pix-key" class="input" placeholder="email@exemplo.com, CPF ou telefone"/></div>
+          <div class="input-group"><label for="warranty-days">Dias de Garantia Padrão</label><input type="number" id="warranty-days" class="input" placeholder="90" min="0" max="365" value="90"/></div>
+          <div class="settings-form--full" style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+            <button type="submit" class="btn btn--primary btn--sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+              Salvar Configurações
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✓ Configurações salvas com sucesso!</div>
+
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { auth, db, doc, getDoc, setDoc, serverTimestamp } from './page-init.js';
+
+    function showToast(){
+      const t=document.getElementById('toast');t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),3000);
+    }
+
+    window.addEventListener('skylab:ready',async({detail:{user}})=>{
+      // Show user info
+      const nameEl=document.getElementById('user-display-name');
+      const emailEl=document.getElementById('user-email');
+      const avatarEl=document.getElementById('user-avatar');
+
+      nameEl.textContent=user.displayName||'Usuário';
+      emailEl.textContent=user.email||'';
+      if(user.photoURL){avatarEl.innerHTML=`<img src="${user.photoURL}" alt="Avatar"/>`}
+      else{avatarEl.textContent=(user.displayName||user.email||'?').charAt(0).toUpperCase()}
+
+      const uid=user.uid;
+      const settingsRef=doc(db,'users',uid,'settings','general');
+
+      // Load existing settings
+      try{
+        const snap=await getDoc(settingsRef);
+        if(snap.exists()){
+          const d=snap.data();
+          if(d.storeName)document.getElementById('store-name').value=d.storeName;
+          if(d.phone)document.getElementById('store-phone').value=d.phone;
+          if(d.address)document.getElementById('store-address').value=d.address;
+          if(d.workHoursOpen)document.getElementById('work-hours-open').value=d.workHoursOpen;
+          if(d.workHoursClose)document.getElementById('work-hours-close').value=d.workHoursClose;
+          if(d.pixKey)document.getElementById('pix-key').value=d.pixKey;
+          if(d.warrantyDays!=null)document.getElementById('warranty-days').value=d.warrantyDays;
+        }
+      }catch(e){console.warn('Settings load error:',e)}
+
+      // Save settings
+      document.getElementById('settings-form').addEventListener('submit',async(e)=>{
+        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
+        try{
+          await setDoc(settingsRef,{
+            storeName:document.getElementById('store-name').value.trim(),
+            phone:document.getElementById('store-phone').value.trim(),
+            address:document.getElementById('store-address').value.trim(),
+            workHoursOpen:document.getElementById('work-hours-open').value,
+            workHoursClose:document.getElementById('work-hours-close').value,
+            pixKey:document.getElementById('pix-key').value.trim(),
+            warrantyDays:parseInt(document.getElementById('warranty-days').value)||90,
+            updatedAt:serverTimestamp()
+          },{merge:true});
+          showToast();
+        }catch(err){alert('Erro ao salvar: '+err.message)}
+        btn.disabled=false;
+      });
+    });
+  </script>
+</body>
+</html>

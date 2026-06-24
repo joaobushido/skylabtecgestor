@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Tabela de Preços</title>
+  <meta name="description" content="Consulte e gerencie sua tabela de preços de serviços." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .p-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.p-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.p-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.p-table tr:hover td{background:rgba(255,255,255,.02)}.margin-badge{padding:3px 8px;border-radius:999px;font-size:.65rem;font-weight:700}.m-good{background:rgba(16,185,129,.12);color:var(--emerald)}.m-low{background:rgba(245,158,11,.12);color:var(--amber)}.m-neg{background:rgba(239,68,68,.12);color:var(--red)}.add-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.p-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}@media(max-width:768px){.add-form{grid-template-columns:1fr}.p-table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Tabela de Preços</h1><p class="page-header__desc">Consulte e gerencie sua tabela de preços de serviços.</p></div>
+
+      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Novo Preço</h3>
+        <form id="p-form" class="add-form">
+          <div class="input-group"><label for="p-service">Serviço</label><input type="text" id="p-service" class="input" placeholder="Troca de tela iPhone 14" required/></div>
+          <div class="input-group"><label for="p-category">Categoria</label><input type="text" id="p-category" class="input" placeholder="Telas"/></div>
+          <div class="input-group"><label for="p-cost">Custo (R$)</label><input type="number" id="p-cost" class="input" placeholder="180.00" step="0.01" min="0" required/></div>
+          <div class="input-group"><label for="p-price">Preço Venda (R$)</label><input type="number" id="p-price" class="input" placeholder="350.00" step="0.01" min="0" required/></div>
+          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Adicionar</button></div>
+        </form>
+      </div>
+
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
+        <div style="padding:20px 24px 0;"><h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Preços Cadastrados <span id="p-count" style="opacity:.5;margin-left:4px;"></span></h3></div>
+        <div id="p-list" style="overflow-x:auto;"><div class="p-empty">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { auth, db, doc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
+    let prices=[];
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+    window.addEventListener('skylab:ready',({detail:{user}})=>{
+      const uid=user.uid,colRef=collection(db,'users',uid,'prices');
+      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{prices=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
+
+      document.getElementById('p-form').addEventListener('submit',async(e)=>{
+        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
+        try{
+          await addDoc(colRef,{
+            service:document.getElementById('p-service').value.trim(),
+            category:document.getElementById('p-category').value.trim(),
+            cost:parseFloat(document.getElementById('p-cost').value)||0,
+            salePrice:parseFloat(document.getElementById('p-price').value)||0,
+            createdAt:serverTimestamp()
+          });
+          e.target.reset();
+        }catch(err){alert('Erro: '+err.message)}
+        btn.disabled=false;
+      });
+    });
+
+    function marginBadge(cost,price){
+      if(!cost||!price)return'—';
+      const margin=((price-cost)/cost*100).toFixed(0);
+      const cls=margin>=50?'m-good':margin>=20?'m-low':'m-neg';
+      return`<span class="margin-badge ${cls}">${margin}%</span>`;
+    }
+
+    function render(){
+      const el=document.getElementById('p-list');
+      document.getElementById('p-count').textContent=`(${prices.length})`;
+      if(!prices.length){el.innerHTML='<div class="p-empty">Nenhum preço cadastrado.</div>';return}
+      el.innerHTML=`<table class="p-table"><thead><tr><th>Serviço</th><th>Categoria</th><th>Custo</th><th>Venda</th><th>Margem</th><th></th></tr></thead><tbody>${prices.map(p=>`<tr>
+        <td style="color:var(--text-1);font-weight:600;">${esc(p.service)}</td>
+        <td>${esc(p.category)}</td>
+        <td style="font-family:var(--f-mono);">${fmtMoney(p.cost)}</td>
+        <td style="font-family:var(--f-mono);font-weight:700;">${fmtMoney(p.salePrice)}</td>
+        <td>${marginBadge(p.cost,p.salePrice)}</td>
+        <td><button class="act-btn" onclick="window.__delP('${p.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td>
+      </tr>`).join('')}</tbody></table>`;
+    }
+    window.__delP=async(id)=>{if(!confirm('Excluir preço?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'prices',id))}catch(e){console.error(e)}};
+  </script>
+</body>
+</html>

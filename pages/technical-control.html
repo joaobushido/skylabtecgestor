@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Controle Técnico</title>
+  <meta name="description" content="Gerencie todas as ordens de serviço da sua assistência técnica." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .os-table { width:100%; border-collapse:separate; border-spacing:0; margin-top:24px; }
+    .os-table th { font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--text-3); text-align:left; padding:12px 14px; border-bottom:1px solid var(--border); }
+    .os-table td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.04); font-size:.85rem; color:var(--text-2); }
+    .os-table tr:hover td { background:rgba(255,255,255,.02); }
+    .os-badge { padding:3px 10px; border-radius:999px; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+    .os-badge--progress { background:rgba(43,98,232,.12); color:var(--blue-bright); }
+    .os-badge--done { background:rgba(16,185,129,.12); color:var(--emerald); }
+    .os-badge--waiting { background:rgba(245,158,11,.12); color:var(--amber); }
+    .os-badge--cancelled { background:rgba(239,68,68,.12); color:var(--red); }
+    .os-actions { display:flex; gap:6px; }
+    .os-actions button { padding:6px; border-radius:6px; color:var(--text-3); transition:color .2s, background .2s; }
+    .os-actions button:hover { color:var(--text-1); background:rgba(255,255,255,.06); }
+    .os-actions button svg { width:16px; height:16px; }
+    .add-form { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:24px; }
+    .add-form--full { grid-column:1/-1; }
+    .os-empty { text-align:center; padding:60px 20px; color:var(--text-3); font-size:.88rem; }
+    @media(max-width:768px) { .add-form { grid-template-columns:1fr; } .os-table { display:block; overflow-x:auto; } }
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="../home.html" class="nav__brand">
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
+        <span class="nav__brand-fallback">SL</span>
+        <span class="nav__brand-text">Sky<em>Lab</em></span>
+      </a>
+      <div class="nav__links">
+        <a href="../home.html">Dashboard</a>
+        <a href="technical-control.html" style="color:var(--text-1)">Reparos</a>
+        <a href="inventory.html">Estoque</a>
+        <a href="billing.html">Financeiro</a>
+      </div>
+      <div class="nav__right">
+        <a href="../home.html" class="btn btn--nav">← Voltar</a>
+        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="nav__mobile" id="navMobile">
+      <a href="../home.html">Dashboard</a>
+      <a href="technical-control.html">Controle Técnico</a>
+      <a href="inventory.html">Estoque</a>
+      <a href="billing.html">Cobranças</a>
+      <a href="warranty.html">Garantias</a>
+      <a href="settings.html">Configurações</a>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal">
+        <h1 class="page-header__title">Controle Técnico</h1>
+        <p class="page-header__desc">Gerencie todas as ordens de serviço da sua assistência.</p>
+      </div>
+
+      <!-- Add New OS -->
+      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Nova Ordem de Serviço</h3>
+        <form id="os-form" class="add-form">
+          <div class="input-group"><label for="os-client">Cliente</label><input type="text" id="os-client" class="input" placeholder="Nome do cliente" required /></div>
+          <div class="input-group"><label for="os-phone">Telefone</label><input type="tel" id="os-phone" class="input" placeholder="(00) 00000-0000" /></div>
+          <div class="input-group"><label for="os-model">Aparelho / Modelo</label><input type="text" id="os-model" class="input" placeholder="iPhone 14 Pro" required /></div>
+          <div class="input-group"><label for="os-imei">IMEI</label><input type="text" id="os-imei" class="input" placeholder="Opcional" /></div>
+          <div class="input-group"><label for="os-service">Tipo de Serviço</label><input type="text" id="os-service" class="input" placeholder="Troca de tela" required /></div>
+          <div class="input-group"><label for="os-price">Valor (R$)</label><input type="number" id="os-price" class="input" placeholder="350.00" step="0.01" min="0" /></div>
+          <div class="input-group add-form--full"><label for="os-obs">Observações</label><input type="text" id="os-obs" class="input" placeholder="Detalhes adicionais..." /></div>
+          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="submit" class="btn btn--primary btn--sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+              Criar OS
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- OS List -->
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
+        <div style="padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;">
+          <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Ordens de Serviço <span id="os-count" style="opacity:.5;margin-left:4px;"></span></h3>
+        </div>
+        <div id="os-list" style="overflow-x:auto;">
+          <div class="os-empty">Carregando...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
+  </footer>
+
+  <script type="module">
+    import { auth, db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, getDocs } from './page-init.js';
+
+    let services = [];
+    let osCounter = 0;
+
+    window.addEventListener('skylab:ready', async ({ detail: { user } }) => {
+      const uid = user.uid;
+      const colRef = collection(db, 'users', uid, 'services');
+
+      // Real-time listener
+      onSnapshot(query(colRef, orderBy('createdAt', 'desc')), (snap) => {
+        services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderList();
+      }, (err) => {
+        console.error('Services listener error:', err);
+        document.getElementById('os-list').innerHTML = '<div class="os-empty">Erro ao carregar dados.</div>';
+      });
+
+      // Get OS counter
+      try {
+        const counterDoc = await getDoc(doc(db, 'users', uid, 'settings', 'counters'));
+        osCounter = counterDoc.exists() ? (counterDoc.data().osCounter || 0) : 0;
+      } catch(e) { osCounter = 0; }
+
+      // Form submit
+      document.getElementById('os-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+
+        osCounter++;
+        const osNum = String(osCounter).padStart(3, '0');
+
+        try {
+          await addDoc(colRef, {
+            osNumber: osNum,
+            client: document.getElementById('os-client').value.trim(),
+            phone: document.getElementById('os-phone').value.trim(),
+            model: document.getElementById('os-model').value.trim(),
+            imei: document.getElementById('os-imei').value.trim(),
+            serviceType: document.getElementById('os-service').value.trim(),
+            price: parseFloat(document.getElementById('os-price').value) || 0,
+            observations: document.getElementById('os-obs').value.trim(),
+            status: 'Em andamento',
+            createdAt: serverTimestamp()
+          });
+          await setDoc(doc(db, 'users', uid, 'settings', 'counters'), { osCounter }, { merge: true });
+          e.target.reset();
+        } catch (err) {
+          console.error('Create OS error:', err);
+          alert('Erro ao criar OS. Tente novamente.');
+          osCounter--;
+        }
+        btn.disabled = false;
+      });
+    });
+
+    function statusBadge(status) {
+      const s = (status || '').toLowerCase();
+      if (s.includes('conclu')) return `<span class="os-badge os-badge--done">${status}</span>`;
+      if (s.includes('aguard')) return `<span class="os-badge os-badge--waiting">${status}</span>`;
+      if (s.includes('cancel')) return `<span class="os-badge os-badge--cancelled">${status}</span>`;
+      return `<span class="os-badge os-badge--progress">${status || 'Em andamento'}</span>`;
+    }
+
+    function esc(s) { return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    function renderList() {
+      const el = document.getElementById('os-list');
+      const countEl = document.getElementById('os-count');
+      if (countEl) countEl.textContent = `(${services.length})`;
+
+      if (!services.length) {
+        el.innerHTML = '<div class="os-empty">Nenhuma OS cadastrada. Crie a primeira acima.</div>';
+        return;
+      }
+
+      el.innerHTML = `<table class="os-table">
+        <thead><tr><th>OS</th><th>Cliente</th><th>Aparelho</th><th>Serviço</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+        <tbody>${services.map(s => `<tr>
+          <td style="font-family:var(--f-mono);color:var(--blue-bright);font-weight:700;">#${esc(s.osNumber)}</td>
+          <td style="color:var(--text-1);font-weight:600;">${esc(s.client)}</td>
+          <td>${esc(s.model)}${s.imei ? '<br><span class="mono" style="font-size:.7rem;color:var(--text-3);">' + esc(s.imei) + '</span>' : ''}</td>
+          <td>${esc(s.serviceType)}</td>
+          <td style="font-family:var(--f-mono);">R$ ${(s.price||0).toFixed(2)}</td>
+          <td>${statusBadge(s.status)}</td>
+          <td class="os-actions">
+            <button onclick="window.__cycleStatus('${s.id}')" title="Próximo status">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            </button>
+            <button onclick="window.__deleteOS('${s.id}')" title="Excluir" style="color:var(--red);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </button>
+          </td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+
+    const STATUSES = ['Em andamento', 'Aguardando peça', 'Concluído', 'Cancelado'];
+
+    window.__cycleStatus = async (id) => {
+      const svc = services.find(s => s.id === id);
+      if (!svc) return;
+      const idx = STATUSES.indexOf(svc.status);
+      const next = STATUSES[(idx + 1) % STATUSES.length];
+      try {
+        const user = auth.currentUser;
+        if (user) await updateDoc(doc(db, 'users', user.uid, 'services', id), { status: next, updatedAt: serverTimestamp() });
+      } catch(e) { console.error('Status update error:', e); }
+    };
+
+    window.__deleteOS = async (id) => {
+      if (!confirm('Excluir esta OS?')) return;
+      try {
+        const user = auth.currentUser;
+        if (user) await deleteDoc(doc(db, 'users', user.uid, 'services', id));
+      } catch(e) { console.error('Delete OS error:', e); }
+    };
+  </script>
+</body>
+</html>

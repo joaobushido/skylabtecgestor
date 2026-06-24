@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Películas Compatíveis</title>
+  <meta name="description" content="Base de dados de películas compatíveis por modelo de aparelho." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .f-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.f-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.f-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.f-table tr:hover td{background:rgba(255,255,255,.02)}.add-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.f-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}.brand-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.65rem;font-weight:700;background:rgba(43,98,232,.12);color:var(--blue-bright)}@media(max-width:768px){.add-form{grid-template-columns:1fr}.f-table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+
+  <div class="page-content">
+    <div class="container" style="max-width:1100px;">
+      <div class="page-header reveal"><h1 class="page-header__title">Películas Compatíveis</h1><p class="page-header__desc">Base de dados de películas compatíveis por modelo.</p></div>
+
+      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
+        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Adicionar Película</h3>
+        <form id="f-form" class="add-form">
+          <div class="input-group"><label for="f-model">Modelo do Aparelho</label><input type="text" id="f-model" class="input" placeholder="iPhone 14 Pro Max" required/></div>
+          <div class="input-group"><label for="f-brand">Marca</label><input type="text" id="f-brand" class="input" placeholder="Apple"/></div>
+          <div class="input-group"><label for="f-type">Tipo de Película</label><select id="f-type" class="input"><option value="Hidrogel">Hidrogel</option><option value="Vidro Temperado">Vidro Temperado</option><option value="Privacidade">Privacidade</option><option value="Fosca">Fosca</option><option value="Cerâmica">Cerâmica</option></select></div>
+          <div class="input-group"><label for="f-size">Tamanho</label><input type="text" id="f-size" class="input" placeholder='6.7"'/></div>
+          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Adicionar</button></div>
+        </form>
+      </div>
+
+      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
+        <div style="padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Catálogo <span id="f-count" style="opacity:.5;margin-left:4px;"></span></h3>
+          <input type="text" id="f-search" class="input" placeholder="Buscar modelo..." style="max-width:250px;padding:8px 14px;font-size:.82rem;"/>
+        </div>
+        <div id="f-list" style="overflow-x:auto;"><div class="f-empty">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
+
+  <script type="module">
+    import { auth, db, doc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
+    let films=[],filterText='';
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function norm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+
+    window.addEventListener('skylab:ready',({detail:{user}})=>{
+      const uid=user.uid,colRef=collection(db,'users',uid,'films');
+      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{films=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
+
+      document.getElementById('f-form').addEventListener('submit',async(e)=>{
+        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
+        try{
+          await addDoc(colRef,{
+            model:document.getElementById('f-model').value.trim(),
+            brand:document.getElementById('f-brand').value.trim(),
+            filmType:document.getElementById('f-type').value,
+            size:document.getElementById('f-size').value.trim(),
+            createdAt:serverTimestamp()
+          });
+          e.target.reset();
+        }catch(err){alert('Erro: '+err.message)}
+        btn.disabled=false;
+      });
+
+      document.getElementById('f-search').addEventListener('input',(e)=>{filterText=e.target.value;render()});
+    });
+
+    function render(){
+      const el=document.getElementById('f-list');
+      const filtered=filterText?films.filter(f=>norm(f.model).includes(norm(filterText))||norm(f.brand).includes(norm(filterText))||norm(f.filmType).includes(norm(filterText))):films;
+      document.getElementById('f-count').textContent=`(${filtered.length}${filterText?' filtrado(s)':''})`;
+      if(!filtered.length){el.innerHTML=`<div class="f-empty">${filterText?'Nenhum resultado para a busca.':'Nenhuma película cadastrada.'}</div>`;return}
+      el.innerHTML=`<table class="f-table"><thead><tr><th>Modelo</th><th>Marca</th><th>Tipo</th><th>Tamanho</th><th></th></tr></thead><tbody>${filtered.map(f=>`<tr>
+        <td style="color:var(--text-1);font-weight:600;">${esc(f.model)}</td>
+        <td><span class="brand-tag">${esc(f.brand)}</span></td>
+        <td>${esc(f.filmType)}</td>
+        <td>${esc(f.size)}</td>
+        <td><button class="act-btn" onclick="window.__delF('${f.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td>
+      </tr>`).join('')}</tbody></table>`;
+    }
+    window.__delF=async(id)=>{if(!confirm('Excluir película?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'films',id))}catch(e){console.error(e)}};
+  </script>
+</body>
+</html>

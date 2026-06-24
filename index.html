@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Login</title>
+  <meta name="description" content="SkyLab TecGestor — Sistema de gestão para assistência técnica. Faça login para acessar o painel." />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .login-divider {
+      display: flex; align-items: center; gap: 16px;
+      margin: 20px 0;
+      color: var(--text-3);
+      font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .1em;
+    }
+    .login-divider::before, .login-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: var(--border);
+    }
+    .btn--google {
+      width: 100%;
+      padding: 14px 24px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: var(--r-m);
+      color: var(--text-1);
+      font-weight: 700; font-size: .88rem;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer;
+      transition: all .3s var(--ease);
+    }
+    .btn--google:hover {
+      background: rgba(255,255,255,.1);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    }
+    .btn--google:active { transform: scale(.97); }
+    .btn--google svg { flex-shrink: 0; }
+    .btn--loading {
+      pointer-events: none; opacity: .7;
+    }
+    .btn--loading::after {
+      content: ''; width: 16px; height: 16px;
+      border: 2px solid currentColor; border-bottom-color: transparent;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin-left: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+
+  <!-- Login Page -->
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-card__logo">
+        <img src="assets/logo.png" alt="SkyLab Assistência Técnica" />
+      </div>
+
+      <h1 class="login-card__title" id="page-title">Bem-vindo de volta</h1>
+      <p class="login-card__subtitle" id="page-subtitle">Acesse o painel de gestão da sua assistência técnica</p>
+
+      <div id="login-error" class="login-card__error">
+        E-mail ou senha incorretos. Tente novamente.
+      </div>
+
+      <!-- Google Login Button -->
+      <button id="google-login-btn" class="btn--google" type="button">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.998 23.998 0 0 0 0 24c0 3.77.9 7.35 2.56 10.53l7.97-5.94z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.94C6.51 42.62 14.62 48 24 48z"/></svg>
+        Entrar com Google
+      </button>
+
+      <div class="login-divider"><span>ou</span></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="login-card__form" autocomplete="on">
+        <div class="input-group">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" class="input" placeholder="seu@email.com" required autocomplete="email" />
+        </div>
+        <div class="input-group">
+          <label for="login-password">Senha</label>
+          <input type="password" id="login-password" class="input" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" id="login-submit" class="btn btn--primary" style="width:100%; margin-top: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+          Entrar
+        </button>
+      </form>
+
+      <div id="login-footer" class="login-card__footer">
+        Não tem conta?
+        <a href="#" id="register-link">Criar conta</a>
+      </div>
+
+      <!-- Register Form (hidden) -->
+      <form id="register-form" class="login-card__form hidden" autocomplete="on">
+        <div class="input-group">
+          <label for="register-name">Nome completo</label>
+          <input type="text" id="register-name" class="input" placeholder="Seu nome" required autocomplete="name" />
+        </div>
+        <div class="input-group">
+          <label for="register-email">E-mail</label>
+          <input type="email" id="register-email" class="input" placeholder="seu@email.com" required autocomplete="email" />
+        </div>
+        <div class="input-group">
+          <label for="register-password">Senha</label>
+          <input type="password" id="register-password" class="input" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password" />
+        </div>
+        <button type="submit" id="register-submit" class="btn btn--primary" style="width:100%; margin-top: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+          Criar conta
+        </button>
+      </form>
+
+      <div id="register-footer" class="login-card__footer hidden">
+        Já tem conta?
+        <a href="#" id="login-link">Fazer login</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      auth, db, googleProvider,
+      onAuthStateChanged, signInWithEmailAndPassword,
+      createUserWithEmailAndPassword, signInWithPopup, updateProfile,
+      ensureUserDoc, getAuthErrorMessage
+    } from './firebase-config.js';
+
+    // ── DOM References ──────────────────────────────
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const registerLink = document.getElementById('register-link');
+    const loginLink = document.getElementById('login-link');
+    const loginError = document.getElementById('login-error');
+    const registerFooter = document.getElementById('register-footer');
+    const loginFooter = document.getElementById('login-footer');
+    const pageTitle = document.getElementById('page-title');
+    const pageSubtitle = document.getElementById('page-subtitle');
+    const googleBtn = document.getElementById('google-login-btn');
+
+    // ── Redirect if already logged in ───────────────
+    onAuthStateChanged(auth, (user) => {
+      if (user) window.location.href = 'home.html';
+    });
+
+    // ── Toggle Login / Register ─────────────────────
+    registerLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.classList.add('hidden');
+      loginFooter.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      registerFooter.classList.remove('hidden');
+      loginError.classList.remove('is-visible');
+      pageTitle.textContent = 'Criar conta';
+      pageSubtitle.textContent = 'Preencha os dados para começar a usar o sistema';
+    });
+
+    loginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      registerForm.classList.add('hidden');
+      registerFooter.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      loginFooter.classList.remove('hidden');
+      loginError.classList.remove('is-visible');
+      pageTitle.textContent = 'Bem-vindo de volta';
+      pageSubtitle.textContent = 'Acesse o painel de gestão da sua assistência técnica';
+    });
+
+    // ── Show Error ──────────────────────────────────
+    function showError(msg) {
+      loginError.textContent = msg;
+      loginError.classList.add('is-visible');
+    }
+
+    function setLoading(btn, loading) {
+      btn.classList.toggle('btn--loading', loading);
+      btn.disabled = loading;
+    }
+
+    // ── Google Login ────────────────────────────────
+    googleBtn.addEventListener('click', async () => {
+      loginError.classList.remove('is-visible');
+      setLoading(googleBtn, true);
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        await ensureUserDoc(result.user);
+        window.location.href = 'home.html';
+      } catch (error) {
+        console.error('Google login error:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          showError(getAuthErrorMessage(error.code));
+        }
+        setLoading(googleBtn, false);
+      }
+    });
+
+    // ── Email Login ─────────────────────────────────
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const submitBtn = document.getElementById('login-submit');
+
+      loginError.classList.remove('is-visible');
+      setLoading(submitBtn, true);
+
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        await ensureUserDoc(cred.user);
+        window.location.href = 'home.html';
+      } catch (error) {
+        console.error('Login error:', error);
+        showError(getAuthErrorMessage(error.code));
+        setLoading(submitBtn, false);
+      }
+    });
+
+    // ── Email Register ──────────────────────────────
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('register-name').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const submitBtn = document.getElementById('register-submit');
+
+      loginError.classList.remove('is-visible');
+
+      if (!name) { showError('Preencha seu nome.'); return; }
+      setLoading(submitBtn, true);
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+        await ensureUserDoc(cred.user);
+        window.location.href = 'home.html';
+      } catch (error) {
+        console.error('Register error:', error);
+        showError(getAuthErrorMessage(error.code));
+        setLoading(submitBtn, false);
+      }
+    });
+  </script>
+</body>
+</html>
