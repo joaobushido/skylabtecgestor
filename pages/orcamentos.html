@@ -4,21 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkyLab TecGestor — Orçamentos</title>
-  <meta name="description" content="Crie e gerencie orçamentos para seus clientes." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    .table-wrapper { overflow-x: auto; width: 100%; }
+    .os-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .os-table th { padding: 16px 12px; color: var(--text-2); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+    .os-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); font-size: 0.95rem; }
+    .os-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge--Pendente { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .badge--Aprovado { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .badge--Rejeitado { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .action-btn:hover { background: var(--border); color: var(--text-1); }
+  </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="orb orb--a" aria-hidden="true"></div>
-  <div class="orb orb--b" aria-hidden="true"></div>
-  <div class="orb orb--c" aria-hidden="true"></div>
-
+  <div class="noise"></div><div class="orb orb--a"></div><div class="orb orb--b"></div><div class="orb orb--c"></div>
   <nav class="nav" id="nav">
     <div class="nav__inner">
       <a href="../home.html" class="nav__brand">
-        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark"
-          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';" />
         <span class="nav__brand-fallback">SL</span>
         <span class="nav__brand-text">Sky<em>Lab</em></span>
       </a>
@@ -26,77 +33,133 @@
         <a href="../home.html">Dashboard</a>
         <a href="technical-control.html">Reparos</a>
         <a href="inventory.html">Estoque</a>
-        <a href="billing.html">Financeiro</a>
       </div>
-      <div class="nav__right">
-        <a href="../home.html" class="btn btn--nav">← Voltar</a>
-        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-    <div class="nav__mobile" id="navMobile">
-      <a href="../home.html">Dashboard</a>
-      <a href="technical-control.html">Controle Técnico</a>
-      <a href="inventory.html">Estoque</a>
-      <a href="billing.html">Cobranças</a>
-      <a href="warranty.html">Garantias</a>
-      <a href="analytics.html">Análises</a>
-      <a href="settings.html">Configurações</a>
+      <div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a></div>
     </div>
   </nav>
 
   <div class="page-content">
     <div class="container">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Orçamentos</h1>
-        <p class="page-header__desc">Crie e gerencie orçamentos para seus clientes.</p>
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div><h1 class="page-header__title">Orçamentos</h1><p class="page-header__desc">Crie e gerencie orçamentos para clientes.</p></div>
+        <button id="btn-new-quote" class="btn btn--primary">Novo Orçamento</button>
       </div>
 
-      <div class="placeholder-card reveal" style="--index:1">
-        <div class="placeholder-card__icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+      <div class="card" style="margin-top: 24px; padding: 0;">
+        <div class="table-wrapper">
+          <table class="os-table">
+            <thead>
+              <tr><th>Cliente</th><th>Aparelho</th><th>Defeito</th><th>Status</th><th>Total (R$)</th><th style="text-align:right;">Ações</th></tr>
+            </thead>
+            <tbody id="quote-tbody"><tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-3);">Carregando...</td></tr></tbody>
+          </table>
         </div>
-        <h2 class="placeholder-card__title">Criação de Orçamentos</h2>
-        <p class="placeholder-card__desc">Conecte ao Firebase para criar orçamentos detalhados, enviar por WhatsApp e converter em OS automaticamente.</p>
-        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
       </div>
-
-      <!-- ═══════════════════════════════════════════
-           🔥 FIREBASE: Quotes CRUD
-           Coleção: users/{uid}/quotes
-
-           Imports necessários:
-           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
-             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-           Exemplo de leitura:
-           const snap = await getDocs(query(collection(db, "users", user.uid, "quotes"), orderBy("createdAt", "desc")));
-
-           Exemplo de escrita:
-           await addDoc(collection(db, "users", user.uid, "quotes"), {
-             client: "Nome do Cliente",
-             items: [{ description: "Troca de tela", price: 350 }],
-             total: 350,
-             status: "pendente",
-             createdAt: serverTimestamp()
-           });
-           ═══════════════════════════════════════════ -->
     </div>
   </div>
 
-  <footer class="footer">
-    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
-  </footer>
+  <div id="quote-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px; width: 100%;">
+      <div class="modal__edit-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 id="modal-title" style="margin:0; font-size:1.1rem; color:var(--text-1);">Novo Orçamento</h3>
+        <button id="btn-close-modal" class="modal__close" style="position:static; margin:0; padding:4px;">✖</button>
+      </div>
+      <form id="quote-form" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <input type="hidden" id="quote-id" />
+        <div class="input-group" style="margin:0;"><label>Cliente</label><input type="text" id="q-client" class="input" required /></div>
+        <div class="input-group" style="margin:0;"><label>Aparelho</label><input type="text" id="q-device" class="input" required /></div>
+        <div class="input-group" style="margin:0;"><label>Defeito Relatado / Serviço</label><input type="text" id="q-issue" class="input" required /></div>
+        <div style="display:flex; gap:16px;">
+          <div class="input-group" style="margin:0; flex:1;"><label>Status</label>
+            <select id="q-status" class="input" required>
+              <option value="Pendente">Pendente</option>
+              <option value="Aprovado">Aprovado</option>
+              <option value="Rejeitado">Rejeitado</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0; flex:1;"><label>Valor Total (R$)</label><input type="number" id="q-total" class="input" step="0.01" required /></div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" id="btn-cancel-modal" class="btn btn--ghost">Cancelar</button>
+          <button type="submit" id="btn-save" class="btn btn--primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <script>
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
-    const toggle = document.getElementById('navToggle');
-    const mobile = document.getElementById('navMobile');
-    toggle?.addEventListener('click', () => { mobile.classList.toggle('is-open'); toggle.classList.toggle('is-active'); });
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
-    }), { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og", authDomain: "tecgestor-skylab.firebaseapp.com", projectId: "tecgestor-skylab", storageBucket: "tecgestor-skylab.firebasestorage.app", messagingSenderId: "512077747740", appId: "1:512077747740:web:80bbef846cb4395f9ab1d9" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "../index.html"; else { currentUser = user; listenToQuotes(); } });
+
+    const tbody = document.getElementById('quote-tbody');
+    const modal = document.getElementById('quote-modal');
+    const form = document.getElementById('quote-form');
+
+    function listenToQuotes() {
+      const q = query(collection(db, "users", currentUser.uid, "quotes"), orderBy("createdAt", "desc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-3);">Nenhum orçamento registrado.</td></tr>`; return; }
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const q = docSnap.data();
+          html += `<tr>
+            <td><strong style="color:var(--text-1);">${q.client}</strong></td>
+            <td>${q.device}</td>
+            <td>${q.issue}</td>
+            <td><span class="badge badge--${q.status}">${q.status}</span></td>
+            <td><strong style="color:var(--emerald);">R$ ${Number(q.total).toFixed(2).replace('.', ',')}</strong></td>
+            <td style="text-align:right;">
+              <button class="action-btn" onclick="window.editQuote('${docSnap.id}', '${q.client}', '${q.device}', '${q.issue}', '${q.status}', '${q.total}')">✏️</button>
+              <button class="action-btn" onclick="window.deleteQuote('${docSnap.id}')">🗑️</button>
+            </td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openModal() { modal.classList.add('is-open'); }
+    function closeModal() { modal.classList.remove('is-open'); form.reset(); document.getElementById('quote-id').value = ''; }
+    
+    document.getElementById('btn-new-quote').addEventListener('click', () => { closeModal(); openModal(); });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+    document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('quote-id').value;
+      const data = {
+        client: document.getElementById('q-client').value,
+        device: document.getElementById('q-device').value,
+        issue: document.getElementById('q-issue').value,
+        status: document.getElementById('q-status').value,
+        total: Number(document.getElementById('q-total').value)
+      };
+      document.getElementById('btn-save').textContent = "Salvando...";
+      try {
+        if (id) await updateDoc(doc(db, "users", currentUser.uid, "quotes", id), data);
+        else { data.createdAt = serverTimestamp(); await addDoc(collection(db, "users", currentUser.uid, "quotes"), data); }
+        closeModal();
+      } catch (e) { alert("Erro ao salvar."); }
+      document.getElementById('btn-save').textContent = "Salvar";
+    });
+
+    window.editQuote = (id, client, device, issue, status, total) => {
+      document.getElementById('quote-id').value = id; document.getElementById('q-client').value = client;
+      document.getElementById('q-device').value = device; document.getElementById('q-issue').value = issue;
+      document.getElementById('q-status').value = status; document.getElementById('q-total').value = total;
+      openModal();
+    };
+    window.deleteQuote = async (id) => { if (confirm("Apagar orçamento?")) await deleteDoc(doc(db, "users", currentUser.uid, "quotes", id)); };
   </script>
 </body>
 </html>
