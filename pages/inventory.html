@@ -7,6 +7,22 @@
   <meta name="description" content="Controle completo do seu inventário de peças e componentes com o SkyLab TecGestor." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* Estilos da tabela e badges */
+    .table-wrapper { overflow-x: auto; width: 100%; }
+    .os-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .os-table th { padding: 16px 12px; color: var(--text-2); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .os-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); font-size: 0.95rem; }
+    .os-table tr:hover td { background: rgba(255,255,255,0.02); }
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge--Baixo { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .badge--Ok { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .action-btn:hover { background: var(--border); color: var(--text-1); }
+    .action-btn--danger:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+  </style>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -25,7 +41,7 @@
       <div class="nav__links">
         <a href="../home.html">Dashboard</a>
         <a href="technical-control.html">Reparos</a>
-        <a href="inventory.html">Estoque</a>
+        <a href="inventory.html" style="color:var(--text-1); font-weight:600;">Estoque</a>
         <a href="billing.html">Financeiro</a>
       </div>
       <div class="nav__right">
@@ -46,43 +62,40 @@
 
   <div class="page-content">
     <div class="container">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Estoque de Peças</h1>
-        <p class="page-header__desc">Controle completo do seu inventário de peças e componentes.</p>
-      </div>
-
-      <div class="placeholder-card reveal" style="--index:1">
-        <div class="placeholder-card__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16.5 9.4l-9-5.19"/>
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-            <line x1="12" y1="22.08" x2="12" y2="12"/>
-          </svg>
+      <div class="page-header reveal" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h1 class="page-header__title">Estoque de Peças</h1>
+          <p class="page-header__desc">Controle completo do seu inventário e componentes.</p>
         </div>
-        <h2 class="placeholder-card__title">Gestão de Estoque</h2>
-        <p class="placeholder-card__desc">Conecte ao Firebase para controlar peças, quantidades, alertas de estoque baixo e histórico de movimentações.</p>
-        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
+        <button id="btn-new-item" class="btn btn--primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar Peça
+        </button>
       </div>
 
-      <!-- ═══════════════════════════════════════════
-           🔥 FIREBASE: Inventory CRUD
-           Coleção: users/{uid}/inventory
-           
-           Imports necessários:
-           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
-             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-           
-           Exemplo de leitura:
-           const snap = await getDocs(collection(db, "users", user.uid, "inventory"));
-           snap.forEach(doc => { console.log(doc.id, doc.data()); });
-           
-           Exemplo de escrita:
-           await addDoc(collection(db, "users", user.uid, "inventory"), {
-             // campos do documento
-             createdAt: serverTimestamp()
-           });
-           ═══════════════════════════════════════════ -->
+      <div class="card reveal" style="--index:1; margin-top: 24px; padding: 0;">
+        <div class="table-wrapper">
+          <table class="os-table">
+            <thead>
+              <tr>
+                <th>Peça / Produto</th>
+                <th>Categoria</th>
+                <th>Qtd</th>
+                <th>Status</th>
+                <th>Preço Venda</th>
+                <th style="text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-3);">
+                  Carregando Estoque...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -90,22 +103,174 @@
     <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
   </footer>
 
-  <script>
-    // Nav scroll
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
-    // Mobile toggle
-    const toggle = document.getElementById('navToggle');
-    const mobile = document.getElementById('navMobile');
-    toggle?.addEventListener('click', () => {
-      mobile.classList.toggle('is-open');
-      toggle.classList.toggle('is-active');
+  <div id="inventory-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px; width: 100%;">
+      <div class="modal__edit-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 id="modal-title" style="margin:0; font-size:1.1rem; color:var(--text-1);">Nova Peça</h3>
+        <button id="btn-close-modal" class="modal__close" style="position:static; margin:0; padding:4px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <form id="inventory-form" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <input type="hidden" id="item-id" />
+        
+        <div class="input-group" style="margin:0;">
+          <label for="item-name">Nome da Peça/Produto</label>
+          <input type="text" id="item-name" class="input" placeholder="Ex: Tela iPhone 13 Pro" required />
+        </div>
+        
+        <div style="display:flex; gap:16px;">
+          <div class="input-group" style="margin:0; flex:2;">
+            <label for="item-category">Categoria</label>
+            <select id="item-category" class="input" required>
+              <option value="Telas">Telas</option>
+              <option value="Baterias">Baterias</option>
+              <option value="Conectores">Conectores</option>
+              <option value="Acessórios">Acessórios</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0; flex:1;">
+            <label for="item-qty">Quantidade</label>
+            <input type="number" id="item-qty" class="input" placeholder="0" min="0" required />
+          </div>
+        </div>
+
+        <div style="display:flex; gap:16px;">
+          <div class="input-group" style="margin:0; flex:1;">
+            <label for="item-cost">Custo (R$)</label>
+            <input type="number" id="item-cost" class="input" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div class="input-group" style="margin:0; flex:1;">
+            <label for="item-price">Valor Venda (R$)</label>
+            <input type="number" id="item-price" class="input" placeholder="0.00" step="0.01" min="0" required />
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" id="btn-cancel-modal" class="btn btn--ghost">Cancelar</button>
+          <button type="submit" id="btn-save-item" class="btn btn--primary">Salvar Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og",
+      authDomain: "tecgestor-skylab.firebaseapp.com",
+      projectId: "tecgestor-skylab",
+      storageBucket: "tecgestor-skylab.firebasestorage.app",
+      messagingSenderId: "512077747740",
+      appId: "1:512077747740:web:80bbef846cb4395f9ab1d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "../index.html";
+      else { currentUser = user; listenToInventory(); }
     });
-    // Reveal
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
-    }), { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    const tbody = document.getElementById('inventory-tbody');
+    const modal = document.getElementById('inventory-modal');
+    const form = document.getElementById('inventory-form');
+    const modalTitle = document.getElementById('modal-title');
+
+    function formatMoney(value) {
+      if (!value) return "R$ 0,00";
+      return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function listenToInventory() {
+      const q = query(collection(db, "users", currentUser.uid, "inventory"), orderBy("name", "asc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-3);">Estoque vazio. Adicione uma peça.</td></tr>`;
+          return;
+        }
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const item = docSnap.data();
+          const id = docSnap.id;
+          const qty = Number(item.qty || 0);
+          const badgeClass = qty <= 2 ? 'badge--Baixo' : 'badge--Ok';
+          const statusText = qty <= 2 ? 'Estoque Baixo' : 'Ok';
+          
+          html += `
+            <tr>
+              <td><strong style="color:var(--text-1);">${item.name}</strong></td>
+              <td>${item.category}</td>
+              <td>${qty} un.</td>
+              <td><span class="badge ${badgeClass}">${statusText}</span></td>
+              <td><strong style="color:var(--emerald);">${formatMoney(item.price)}</strong></td>
+              <td style="text-align:right;">
+                <button class="action-btn" onclick="window.editItem('${id}', '${item.name}', '${item.category}', '${item.qty}', '${item.cost}', '${item.price}')">✏️</button>
+                <button class="action-btn action-btn--danger" onclick="window.deleteItem('${id}')" style="margin-left:4px;">🗑️</button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openModal() { modal.classList.add('is-open'); }
+    function closeModal() { modal.classList.remove('is-open'); form.reset(); document.getElementById('item-id').value = ''; }
+
+    document.getElementById('btn-new-item').addEventListener('click', () => {
+      modalTitle.textContent = "Adicionar Peça"; closeModal(); openModal();
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+    document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('item-id').value;
+      const data = {
+        name: document.getElementById('item-name').value,
+        category: document.getElementById('item-category').value,
+        qty: Number(document.getElementById('item-qty').value),
+        cost: Number(document.getElementById('item-cost').value || 0),
+        price: Number(document.getElementById('item-price').value || 0)
+      };
+
+      document.getElementById('btn-save-item').textContent = "Salvando...";
+      try {
+        if (id) await updateDoc(doc(db, "users", currentUser.uid, "inventory", id), data);
+        else {
+          data.createdAt = serverTimestamp();
+          await addDoc(collection(db, "users", currentUser.uid, "inventory"), data);
+        }
+        closeModal();
+      } catch (error) { alert("Erro ao salvar."); }
+      document.getElementById('btn-save-item').textContent = "Salvar Item";
+    });
+
+    window.editItem = (id, name, category, qty, cost, price) => {
+      modalTitle.textContent = "Editar Peça";
+      document.getElementById('item-id').value = id;
+      document.getElementById('item-name').value = name;
+      document.getElementById('item-category').value = category;
+      document.getElementById('item-qty').value = qty;
+      document.getElementById('item-cost').value = cost !== 'undefined' ? cost : '';
+      document.getElementById('item-price').value = price;
+      openModal();
+    };
+
+    window.deleteItem = async (id) => {
+      if (confirm("Apagar esta peça do estoque?")) {
+        await deleteDoc(doc(db, "users", currentUser.uid, "inventory", id));
+      }
+    };
   </script>
 </body>
 </html>
