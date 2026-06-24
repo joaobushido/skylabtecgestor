@@ -3,97 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyLab TecGestor — Películas Compatíveis</title>
-  <meta name="description" content="Base de dados de películas compatíveis por modelo de aparelho." />
+  <title>SkyLab TecGestor — Películas</title>
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    .table-wrapper { overflow-x: auto; width: 100%; }
+    .os-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .os-table th { padding: 16px 12px; color: var(--text-2); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+    .os-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); font-size: 0.95rem; }
+    .os-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .action-btn:hover { background: var(--border); color: var(--text-1); }
+  </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="orb orb--a" aria-hidden="true"></div>
-  <div class="orb orb--b" aria-hidden="true"></div>
-  <div class="orb orb--c" aria-hidden="true"></div>
-
+  <div class="noise"></div><div class="orb orb--a"></div><div class="orb orb--b"></div><div class="orb orb--c"></div>
   <nav class="nav" id="nav">
     <div class="nav__inner">
       <a href="../home.html" class="nav__brand">
-        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark"
-          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
-        <span class="nav__brand-fallback">SL</span>
-        <span class="nav__brand-text">Sky<em>Lab</em></span>
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';" />
+        <span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span>
       </a>
-      <div class="nav__links">
-        <a href="../home.html">Dashboard</a>
-        <a href="technical-control.html">Reparos</a>
-        <a href="inventory.html">Estoque</a>
-        <a href="billing.html">Financeiro</a>
-      </div>
-      <div class="nav__right">
-        <a href="../home.html" class="btn btn--nav">← Voltar</a>
-        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-    <div class="nav__mobile" id="navMobile">
-      <a href="../home.html">Dashboard</a>
-      <a href="technical-control.html">Controle Técnico</a>
-      <a href="inventory.html">Estoque</a>
-      <a href="billing.html">Cobranças</a>
-      <a href="warranty.html">Garantias</a>
-      <a href="analytics.html">Análises</a>
-      <a href="settings.html">Configurações</a>
+      <div class="nav__links"><a href="../home.html">Dashboard</a></div>
+      <div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a></div>
     </div>
   </nav>
 
   <div class="page-content">
     <div class="container">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Películas Compatíveis</h1>
-        <p class="page-header__desc">Base de dados de películas compatíveis por modelo.</p>
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div><h1 class="page-header__title">Películas Compatíveis</h1><p class="page-header__desc">Guia rápido de compatibilidade de telas.</p></div>
+        <button id="btn-new-film" class="btn btn--primary">Adicionar Modelo</button>
       </div>
 
-      <div class="placeholder-card reveal" style="--index:1">
-        <div class="placeholder-card__icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+      <div class="card" style="margin-top: 24px; padding: 0;">
+        <div class="table-wrapper">
+          <table class="os-table">
+            <thead>
+              <tr><th>Modelo do Aparelho</th><th>Marca</th><th>Tamanho / Tipo</th><th>Compatível com</th><th style="text-align:right;">Ações</th></tr>
+            </thead>
+            <tbody id="film-tbody"><tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-3);">Carregando...</td></tr></tbody>
+          </table>
         </div>
-        <h2 class="placeholder-card__title">Catálogo de Películas</h2>
-        <p class="placeholder-card__desc">Conecte ao Firebase para manter um catálogo de películas com compatibilidade por modelo de aparelho.</p>
-        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
       </div>
-
-      <!-- ═══════════════════════════════════════════
-           🔥 FIREBASE: Films CRUD
-           Coleção: users/{uid}/films
-
-           Imports necessários:
-           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
-             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-           Exemplo de escrita:
-           await addDoc(collection(db, "users", user.uid, "films"), {
-             model: "iPhone 14 Pro Max",
-             brand: "Apple",
-             filmType: "Hidrogel",
-             size: "6.7 polegadas",
-             createdAt: serverTimestamp()
-           });
-           ═══════════════════════════════════════════ -->
     </div>
   </div>
 
-  <footer class="footer">
-    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
-  </footer>
+  <div id="film-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px; width: 100%;">
+      <div class="modal__edit-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 id="modal-title" style="margin:0; font-size:1.1rem; color:var(--text-1);">Registrar Película</h3>
+        <button id="btn-close-modal" class="modal__close" style="position:static; margin:0; padding:4px;">✖</button>
+      </div>
+      <form id="film-form" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <input type="hidden" id="f-id" />
+        <div style="display:flex; gap:16px;">
+          <div class="input-group" style="margin:0; flex:1;"><label>Marca</label><input type="text" id="f-brand" class="input" placeholder="Ex: Xiaomi" required /></div>
+          <div class="input-group" style="margin:0; flex:2;"><label>Modelo Original</label><input type="text" id="f-model" class="input" placeholder="Ex: Redmi Note 12" required /></div>
+        </div>
+        <div class="input-group" style="margin:0;"><label>Tipo / Tamanho da Tela</label><input type="text" id="f-type" class="input" placeholder="Ex: 3D / 6.67 pol." /></div>
+        <div class="input-group" style="margin:0;"><label>É a mesma película do:</label><input type="text" id="f-comp" class="input" placeholder="Ex: Poco X5 / Redmi 12" /></div>
+        
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" id="btn-cancel-modal" class="btn btn--ghost">Cancelar</button>
+          <button type="submit" class="btn btn--primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <script>
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
-    const toggle = document.getElementById('navToggle');
-    const mobile = document.getElementById('navMobile');
-    toggle?.addEventListener('click', () => { mobile.classList.toggle('is-open'); toggle.classList.toggle('is-active'); });
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
-    }), { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og", authDomain: "tecgestor-skylab.firebaseapp.com", projectId: "tecgestor-skylab", storageBucket: "tecgestor-skylab.firebasestorage.app", messagingSenderId: "512077747740", appId: "1:512077747740:web:80bbef846cb4395f9ab1d9" };
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "../index.html"; else { currentUser = user; listenToFilms(); } });
+
+    const tbody = document.getElementById('film-tbody'); const modal = document.getElementById('film-modal'); const form = document.getElementById('film-form');
+
+    function listenToFilms() {
+      const q = query(collection(db, "users", currentUser.uid, "films"), orderBy("brand", "asc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-3);">Nenhum registro.</td></tr>`; return; }
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const f = docSnap.data();
+          html += `<tr>
+            <td><strong style="color:var(--text-1);">${f.model}</strong></td><td>${f.brand}</td><td>${f.type || '-'}</td>
+            <td style="color:var(--cyan);">${f.compatible || '-'}</td>
+            <td style="text-align:right;">
+              <button class="action-btn" onclick="window.editFilm('${docSnap.id}', '${f.brand}', '${f.model}', '${f.type}', '${f.compatible}')">✏️</button>
+              <button class="action-btn" onclick="window.deleteFilm('${docSnap.id}')">🗑️</button>
+            </td></tr>`;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openModal() { modal.classList.add('is-open'); }
+    function closeModal() { modal.classList.remove('is-open'); form.reset(); document.getElementById('f-id').value = ''; }
+    document.getElementById('btn-new-film').addEventListener('click', () => { closeModal(); openModal(); });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal); document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('f-id').value;
+      const data = { brand: document.getElementById('f-brand').value, model: document.getElementById('f-model').value, type: document.getElementById('f-type').value, compatible: document.getElementById('f-comp').value };
+      try {
+        if (id) await updateDoc(doc(db, "users", currentUser.uid, "films", id), data);
+        else { data.createdAt = serverTimestamp(); await addDoc(collection(db, "users", currentUser.uid, "films"), data); }
+        closeModal();
+      } catch (e) { alert("Erro ao salvar."); }
+    });
+
+    window.editFilm = (id, b, m, t, c) => {
+      document.getElementById('f-id').value = id; document.getElementById('f-brand').value = b; document.getElementById('f-model').value = m; document.getElementById('f-type').value = t !== 'undefined' ? t : ''; document.getElementById('f-comp').value = c !== 'undefined' ? c : ''; openModal();
+    };
+    window.deleteFilm = async (id) => { if (confirm("Apagar este registro?")) await deleteDoc(doc(db, "users", currentUser.uid, "films", id)); };
   </script>
 </body>
 </html>
