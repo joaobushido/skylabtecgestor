@@ -1,3 +1,21 @@
+// 🔥 FIREBASE: Inicialização e Conexão com o Banco de Dados
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, query, orderBy, limit, serverTimestamp, Timestamp, getDocs, where, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og",
+  authDomain: "tecgestor-skylab.firebaseapp.com",
+  projectId: "tecgestor-skylab",
+  storageBucket: "tecgestor-skylab.firebasestorage.app",
+  messagingSenderId: "512077747740",
+  appId: "1:512077747740:web:80bbef846cb4395f9ab1d9"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 /* =========================================================
    SKYLAB TECGESTOR — Main Application Logic
    Dashboard, search, notifications, shortcuts, FAB, auth
@@ -5,33 +23,6 @@
 
 (() => {
   'use strict';
-
-  // ═══════════════════════════════════════════════════════════
-  // 🔥 FIREBASE: Configuration & Initialization
-  // Descomente e configure quando conectar ao Firebase
-  //
-  // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-  // import { getAuth, onAuthStateChanged, signOut }
-  //   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-  // import { getFirestore, doc, getDoc, setDoc, updateDoc,
-  //   collection, onSnapshot, query, orderBy, limit,
-  //   serverTimestamp, Timestamp, getDocs, where, arrayUnion }
-  //   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-  //
-  // const firebaseConfig = {
-  //   apiKey: "SUA_API_KEY",
-  //   authDomain: "SEU_AUTH_DOMAIN",
-  //   projectId: "SEU_PROJECT_ID",
-  //   storageBucket: "SEU_STORAGE_BUCKET",
-  //   messagingSenderId: "SEU_SENDER_ID",
-  //   appId: "SEU_APP_ID",
-  //   measurementId: "SEU_MEASUREMENT_ID"
-  // };
-  //
-  // const app = initializeApp(firebaseConfig);
-  // const auth = getAuth(app);
-  // const db = getFirestore(app);
-  // ═══════════════════════════════════════════════════════════
 
   // ── Helpers ────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
@@ -58,7 +49,6 @@
     lightbulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
     'shopping-bag': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>',
-    // Utility icons
     pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
     trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
     grip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>',
@@ -135,15 +125,6 @@
   // 1. AUTH CHECK
   // ══════════════════════════════════════════════════════════
 
-  // ═══════════════════════════════════════════
-  // 🔥 FIREBASE: Auth State
-  // onAuthStateChanged(auth, async (user) => {
-  //   if (!user) { window.location.href = "index.html"; return; }
-  //   hideAuthOverlay();
-  //   await initDashboard(user);
-  // });
-  // ═══════════════════════════════════════════
-
   // DEMO: Check localStorage for demo user
   const demoUser = JSON.parse(localStorage.getItem('skylab_demo_user') || 'null');
   if (!demoUser) {
@@ -165,7 +146,6 @@
   // 2. NAVBAR
   // ══════════════════════════════════════════════════════════
 
-  // Nav scroll state
   const nav = $('#nav');
   if (nav) {
     window.addEventListener('scroll', () => {
@@ -173,7 +153,6 @@
     }, { passive: true });
   }
 
-  // Mobile menu toggle
   const navToggle = $('#navToggle');
   const navMobile = $('#navMobile');
   if (navToggle && navMobile) {
@@ -184,7 +163,6 @@
     });
   }
 
-  // Dropdown menu
   const menuBtn = $('#menu-btn');
   const dropdownMenu = $('#dropdown-menu');
   const notifBtn = $('#notif-btn');
@@ -221,7 +199,6 @@
     }
   });
 
-  // Dark mode toggle
   const themeToggle = $('#theme-toggle');
   const iconMoon = $('#icon-moon');
   const iconSun = $('#icon-sun');
@@ -253,17 +230,18 @@
     });
   }
 
-  // Logout
+  // Logout Integrado com Firebase
   $('#logout-btn')?.addEventListener('click', async () => {
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: Sign Out
-    // await signOut(auth);
-    // ═══════════════════════════════════════════
+    try {
+      await signOut(auth);
+      console.log("Deslogado com sucesso do Firebase");
+    } catch (error) {
+      console.error("Erro ao deslogar:", error);
+    }
     localStorage.removeItem('skylab_demo_user');
     window.location.href = 'index.html';
   });
 
-  // Banner close
   $('#plan-banner-close')?.addEventListener('click', () => {
     $('#plan-banner')?.classList.add('is-hidden');
     setTimeout(() => $('#plan-banner')?.classList.add('hidden'), 400);
@@ -309,7 +287,6 @@
     renderNotifications();
   }
 
-  // Tab click handlers
   $('#tab-admin')?.addEventListener('click', () => switchNotifTab('admin'));
   $('#tab-sistema')?.addEventListener('click', () => switchNotifTab('sistema'));
   $('#mark-all-read')?.addEventListener('click', () => {
@@ -369,26 +346,6 @@
     renderNotifications();
   };
 
-  // ═══════════════════════════════════════════
-  // 🔥 FIREBASE: Real-time Notifications
-  // Listen to Firestore collections:
-  // - "app_notifications" for admin notifications
-  // - "users/{uid}/inventory" for stock alerts
-  // - "users/{uid}/warranties" for warranty expiry alerts
-  // - "users/{uid}/services" for new service notifications
-  // - "users/{uid}/sales" for sale notifications
-  //
-  // Example:
-  // onSnapshot(collection(db, "users", user.uid, "inventory"), (snap) => {
-  //   systemNotifications = systemNotifications.filter(n => n.source !== 'stock');
-  //   snap.forEach(d => {
-  //     if (d.data().qty <= 2) { /* push stock notification */ }
-  //   });
-  //   renderNotifications();
-  // });
-  // ═══════════════════════════════════════════
-
-  // DEMO: Add sample notifications
   systemNotifications = [
     { id: 'demo-1', type: 'success', title: 'Novo Serviço', message: 'João Silva - iPhone 14 Pro: Troca de tela', timestamp: Date.now() - 300000 },
     { id: 'demo-2', type: 'stock', title: 'Estoque Baixo', message: '3 itens precisam de reposição: Tela iPhone 13, Bateria Samsung S22...', timestamp: Date.now() - 600000 },
@@ -407,32 +364,6 @@
   const searchPanel = $('#global-search-panel');
   let searchDebounce;
 
-  // ═══════════════════════════════════════════
-  // 🔥 FIREBASE: Global Search Data
-  // Load data from Firestore collections:
-  // - "users/{uid}/services"
-  // - "users/{uid}/warranties"
-  // - "users/{uid}/inventory"
-  // - "users/{uid}/clients"
-  //
-  // let searchCache = null;
-  // async function loadSearchData(uid) {
-  //   const [svc, warr, inv, cli] = await Promise.all([
-  //     getDocs(collection(db, "users", uid, "services")),
-  //     getDocs(collection(db, "users", uid, "warranties")),
-  //     getDocs(collection(db, "users", uid, "inventory")),
-  //     getDocs(collection(db, "users", uid, "clients")),
-  //   ]);
-  //   searchCache = {
-  //     services: svc.docs.map(d => ({ id: d.id, ...d.data() })),
-  //     warranties: warr.docs.map(d => ({ id: d.id, ...d.data() })),
-  //     inventory: inv.docs.map(d => ({ id: d.id, ...d.data() })),
-  //     clients: cli.docs.map(d => ({ id: d.id, ...d.data() })),
-  //   };
-  // }
-  // ═══════════════════════════════════════════
-
-  // DEMO: Sample search data
   const demoSearchData = {
     services: [
       { id: 's1', osNumber: '001', client: 'João Silva', model: 'iPhone 14 Pro', serviceType: 'Troca de tela', status: 'Em andamento', imei: '123456789012345' },
@@ -477,7 +408,7 @@
     const t = term.trim();
     if (!t) { searchPanel.classList.remove('is-open'); return; }
 
-    const data = demoSearchData; // Replace with searchCache when Firebase connected
+    const data = demoSearchData; 
     const svcHits = data.services.filter(s => searchMatches(t, [s.client, s.model, s.osNumber, s.serviceType, s.imei, s.status])).slice(0, 6);
     const warHits = data.warranties.filter(w => searchMatches(t, [w.client, w.device, w.osNumber, w.type])).slice(0, 6);
     const invHits = data.inventory.filter(i => searchMatches(t, [i.name, i.category, i.code])).slice(0, 6);
@@ -556,13 +487,11 @@
     });
   }
 
-  // Close search on outside click
   document.addEventListener('click', (e) => {
     const wrap = $('#global-search-wrapper');
     if (wrap && !wrap.contains(e.target)) searchPanel?.classList.remove('is-open');
   });
 
-  // Ctrl+K shortcut
   document.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     if ((isMac ? e.metaKey : e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
@@ -729,7 +658,6 @@
         input.addEventListener('click', e => e.stopPropagation());
       });
 
-      // Drag and Drop
       el.addEventListener('dragstart', (e) => {
         el.style.opacity = '.4';
         e.dataTransfer.setData('text/plain', key);
@@ -756,7 +684,6 @@
     });
   }
 
-  // Picker
   function openPicker(kind) {
     const max = kind === 'buttons' ? MAX_BUTTONS : MAX_CARDS;
     if (draftConfig[kind].length >= max) {
@@ -813,7 +740,6 @@
     });
   }
 
-  // Modal controls
   function openEditModal() {
     draftConfig = clone(currentConfig);
     expandedKey = null;
@@ -844,12 +770,6 @@
     localStorage.setItem(DISMISS_KEY, '1');
     $('#home-customize-banner')?.classList.add('hidden');
     closeEditModal();
-
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: Save Shortcuts
-    // await setDoc(doc(db, 'users', user.uid, 'preferences', 'homeShortcuts'),
-    //   { ...currentConfig, updatedAt: serverTimestamp() }, { merge: false });
-    // ═══════════════════════════════════════════
   });
 
   $('#home-add-button')?.addEventListener('click', () => openPicker('buttons'));
@@ -922,21 +842,6 @@
     }
   });
 
-  // ═══════════════════════════════════════════
-  // 🔥 FIREBASE: Announcements
-  // async function checkAnnouncements() {
-  //   const snap = await getDocs(
-  //     query(collection(db, "announcements"),
-  //     where("active", "==", true),
-  //     orderBy("createdAt", "desc"))
-  //   );
-  //   if (snap.empty) return;
-  //   // ... frequency cap logic with localStorage ...
-  //   showAnnouncement(chosen.text, chosen.link, chosen.buttonText);
-  // }
-  // checkAnnouncements();
-  // ═══════════════════════════════════════════
-
   // ══════════════════════════════════════════════════════════
   // 9. REVEAL ANIMATIONS
   // ══════════════════════════════════════════════════════════
@@ -957,69 +862,17 @@
   // ══════════════════════════════════════════════════════════
 
   function initDashboard() {
-    // Load shortcuts config
     currentConfig = loadConfig();
     renderShortcuts(currentConfig);
 
-    // Show edit button
     const editBtn = $('#home-edit-btn');
     if (editBtn) editBtn.classList.remove('hidden');
 
-    // Show customize banner if not dismissed
     const dismissed = localStorage.getItem(DISMISS_KEY) === '1';
     const hasCustom = !!localStorage.getItem(CACHE_KEY);
     if (!dismissed && !hasCustom) {
       $('#home-customize-banner')?.classList.remove('hidden');
     }
-
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: Load Branding
-    // const settingsSnap = await getDoc(doc(db, "users", user.uid, "settings", "general"));
-    // if (settingsSnap.exists()) {
-    //   const data = settingsSnap.data();
-    //   if (data.storeName) $('#header-store-name').textContent = data.storeName;
-    //   if (data.logo) {
-    //     const logoEl = document.querySelector('.nav__brand-mark');
-    //     if (logoEl) logoEl.src = data.logo;
-    //   }
-    // }
-    // ═══════════════════════════════════════════
-
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: User Presence
-    // async function updatePresence() {
-    //   await setDoc(doc(db, "users", user.uid), {
-    //     isOnline: true, lastActive: serverTimestamp()
-    //   }, { merge: true });
-    // }
-    // updatePresence();
-    // setInterval(updatePresence, 15000);
-    //
-    // window.addEventListener('beforeunload', () => {
-    //   setDoc(doc(db, "users", user.uid), {
-    //     isOnline: false, lastActive: serverTimestamp()
-    //   }, { merge: true });
-    // });
-    // ═══════════════════════════════════════════
-
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: Plan Expiration Check
-    // const userDoc = await getDoc(doc(db, "users", user.uid));
-    // if (userDoc.exists()) {
-    //   let expiresAt = userDoc.data().accessExpiresAt;
-    //   // ... expiration logic, show plan-banner ...
-    // }
-    // ═══════════════════════════════════════════
-
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: Load Remote Shortcuts
-    // const snap = await getDoc(doc(db, 'users', user.uid, 'preferences', 'homeShortcuts'));
-    // if (snap.exists()) {
-    //   currentConfig = sanitize(snap.data());
-    //   saveConfig(currentConfig);
-    //   renderShortcuts(currentConfig);
-    // }
-    // ═══════════════════════════════════════════
   }
 
 })();
