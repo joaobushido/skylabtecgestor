@@ -1,4 +1,9 @@
-// 🔥 FIREBASE: Inicialização e Conexão com o Banco de Dados
+/* =========================================================
+   SKYLAB TECGESTOR — Main Application Logic
+   Dashboard, search, notifications, shortcuts, FAB, auth
+   ========================================================= */
+
+// 🔥 FIREBASE: Configuration & Initialization
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, query, orderBy, limit, serverTimestamp, Timestamp, getDocs, where, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -16,10 +21,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* =========================================================
-   SKYLAB TECGESTOR — Main Application Logic
-   Dashboard, search, notifications, shortcuts, FAB, auth
-   ========================================================= */
+// Deixa o db e o auth globais para o resto do site conseguir usar depois se precisar
+window.db = db;
+window.auth = auth;
 
 (() => {
   'use strict';
@@ -122,17 +126,18 @@ const db = getFirestore(app);
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
   // ══════════════════════════════════════════════════════════
-  // 1. AUTH CHECK
+  // 1. AUTH CHECK FIREBASE
   // ══════════════════════════════════════════════════════════
 
-  // DEMO: Check localStorage for demo user
-  const demoUser = JSON.parse(localStorage.getItem('skylab_demo_user') || 'null');
-  if (!demoUser) {
-    // Not logged in — redirect
-    // window.location.href = 'index.html'; // Uncomment in production
-  }
-  hideAuthOverlay();
-  initDashboard();
+  // Ouve as mudanças de estado da conta. Redireciona se não estiver logado.
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { 
+      window.location.href = "index.html"; 
+      return; 
+    }
+    hideAuthOverlay();
+    await initDashboard(user);
+  });
 
   function hideAuthOverlay() {
     const overlay = $('#auth-guard');
@@ -230,16 +235,14 @@ const db = getFirestore(app);
     });
   }
 
-  // Logout Integrado com Firebase
+  // Logout com o Firebase
   $('#logout-btn')?.addEventListener('click', async () => {
     try {
       await signOut(auth);
-      console.log("Deslogado com sucesso do Firebase");
+      // Redirecionamento já é tratado pelo onAuthStateChanged acima
     } catch (error) {
-      console.error("Erro ao deslogar:", error);
+      console.error("Erro ao sair:", error);
     }
-    localStorage.removeItem('skylab_demo_user');
-    window.location.href = 'index.html';
   });
 
   $('#plan-banner-close')?.addEventListener('click', () => {
@@ -861,7 +864,7 @@ const db = getFirestore(app);
   // 10. INITIALIZATION
   // ══════════════════════════════════════════════════════════
 
-  function initDashboard() {
+  async function initDashboard(user) {
     currentConfig = loadConfig();
     renderShortcuts(currentConfig);
 
