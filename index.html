@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Login</title>
+  <meta name="description" content="SkyLab TecGestor — Sistema de gestão para assistência técnica. Faça login para acessar o painel." />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+
+  <!-- Login Page -->
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-card__logo">
+        <img src="assets/logo.png" alt="SkyLab Assistência Técnica" />
+      </div>
+
+      <h1 class="login-card__title">Bem-vindo de volta</h1>
+      <p class="login-card__subtitle">Acesse o painel de gestão da sua assistência técnica</p>
+
+      <div id="login-error" class="login-card__error">
+        E-mail ou senha incorretos. Tente novamente.
+      </div>
+
+      <form id="login-form" class="login-card__form" autocomplete="on">
+        <div class="input-group">
+          <label for="login-email">E-mail</label>
+          <input
+            type="email"
+            id="login-email"
+            class="input"
+            placeholder="seu@email.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="login-password">Senha</label>
+          <input
+            type="password"
+            id="login-password"
+            class="input"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" id="login-submit" class="btn btn--primary" style="width:100%; margin-top: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+          Entrar
+        </button>
+      </form>
+
+      <div class="login-card__footer">
+        Não tem conta?
+        <a href="#" id="register-link">Criar conta</a>
+      </div>
+
+      <!-- ═══════════════════════════════════════════
+           REGISTER FORM (hidden by default)
+           ═══════════════════════════════════════════ -->
+      <form id="register-form" class="login-card__form hidden" autocomplete="on">
+        <div class="input-group">
+          <label for="register-name">Nome completo</label>
+          <input
+            type="text"
+            id="register-name"
+            class="input"
+            placeholder="Seu nome"
+            required
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="register-email">E-mail</label>
+          <input
+            type="email"
+            id="register-email"
+            class="input"
+            placeholder="seu@email.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="register-password">Senha</label>
+          <input
+            type="password"
+            id="register-password"
+            class="input"
+            placeholder="Mínimo 6 caracteres"
+            required
+            minlength="6"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button type="submit" id="register-submit" class="btn btn--primary" style="width:100%; margin-top: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+          Criar conta
+        </button>
+      </form>
+
+      <div id="register-footer" class="login-card__footer hidden">
+        Já tem conta?
+        <a href="#" id="login-link">Fazer login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // 🔥 FIREBASE: Authentication
+    // Descomente e configure quando conectar ao Firebase
+    //
+    // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    // import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged }
+    //   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    //
+    // const firebaseConfig = {
+    //   apiKey: "SUA_API_KEY",
+    //   authDomain: "SEU_AUTH_DOMAIN",
+    //   projectId: "SEU_PROJECT_ID",
+    //   storageBucket: "SEU_STORAGE_BUCKET",
+    //   messagingSenderId: "SEU_SENDER_ID",
+    //   appId: "SEU_APP_ID"
+    // };
+    //
+    // const app = initializeApp(firebaseConfig);
+    // const auth = getAuth(app);
+    //
+    // // Redirect if already logged in
+    // onAuthStateChanged(auth, (user) => {
+    //   if (user) window.location.href = "home.html";
+    // });
+    // ═══════════════════════════════════════════════════════════
+
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const registerLink = document.getElementById('register-link');
+    const loginLink = document.getElementById('login-link');
+    const loginError = document.getElementById('login-error');
+    const registerFooter = document.getElementById('register-footer');
+    const loginFooter = document.querySelector('.login-card__footer');
+    const loginTitle = document.querySelector('.login-card__title');
+    const loginSubtitle = document.querySelector('.login-card__subtitle');
+
+    // Toggle between login and register
+    registerLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.classList.add('hidden');
+      loginFooter.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      registerFooter.classList.remove('hidden');
+      loginError.classList.remove('is-visible');
+      loginTitle.textContent = 'Criar conta';
+      loginSubtitle.textContent = 'Preencha os dados para começar a usar o sistema';
+    });
+
+    loginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      registerForm.classList.add('hidden');
+      registerFooter.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      loginFooter.classList.remove('hidden');
+      loginError.classList.remove('is-visible');
+      loginTitle.textContent = 'Bem-vindo de volta';
+      loginSubtitle.textContent = 'Acesse o painel de gestão da sua assistência técnica';
+    });
+
+    // Login form submit
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      loginError.classList.remove('is-visible');
+
+      // ═══════════════════════════════════════════
+      // 🔥 FIREBASE: Sign In
+      // try {
+      //   await signInWithEmailAndPassword(auth, email, password);
+      //   window.location.href = "home.html";
+      // } catch (error) {
+      //   loginError.textContent = getErrorMessage(error.code);
+      //   loginError.classList.add('is-visible');
+      // }
+      // ═══════════════════════════════════════════
+
+      // DEMO: redirect direto (remover quando conectar Firebase)
+      if (email && password) {
+        localStorage.setItem('skylab_demo_user', JSON.stringify({ email, name: 'Usuário Demo' }));
+        window.location.href = 'home.html';
+      } else {
+        loginError.textContent = 'Preencha todos os campos.';
+        loginError.classList.add('is-visible');
+      }
+    });
+
+    // Register form submit
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+
+      loginError.classList.remove('is-visible');
+
+      // ═══════════════════════════════════════════
+      // 🔥 FIREBASE: Create Account
+      // try {
+      //   const cred = await createUserWithEmailAndPassword(auth, email, password);
+      //   // Save user profile in Firestore
+      //   // await setDoc(doc(db, "users", cred.user.uid), {
+      //   //   name: name,
+      //   //   email: email,
+      //   //   createdAt: serverTimestamp()
+      //   // });
+      //   window.location.href = "home.html";
+      // } catch (error) {
+      //   loginError.textContent = getErrorMessage(error.code);
+      //   loginError.classList.add('is-visible');
+      // }
+      // ═══════════════════════════════════════════
+
+      // DEMO: redirect direto
+      if (name && email && password.length >= 6) {
+        localStorage.setItem('skylab_demo_user', JSON.stringify({ email, name }));
+        window.location.href = 'home.html';
+      } else {
+        loginError.textContent = 'Preencha todos os campos. A senha deve ter pelo menos 6 caracteres.';
+        loginError.classList.add('is-visible');
+      }
+    });
+
+    // ═══════════════════════════════════════════
+    // 🔥 FIREBASE: Error Message Helper
+    // function getErrorMessage(code) {
+    //   const msgs = {
+    //     'auth/invalid-email': 'E-mail inválido.',
+    //     'auth/user-disabled': 'Conta desabilitada.',
+    //     'auth/user-not-found': 'Usuário não encontrado.',
+    //     'auth/wrong-password': 'Senha incorreta.',
+    //     'auth/email-already-in-use': 'Este e-mail já está em uso.',
+    //     'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+    //   };
+    //   return msgs[code] || 'Erro ao autenticar. Tente novamente.';
+    // }
+    // ═══════════════════════════════════════════
+  </script>
+</body>
+</html>

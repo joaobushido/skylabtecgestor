@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Tabela de Preços</title>
+  <meta name="description" content="Consulte e gerencie sua tabela de preços de serviços." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="../home.html" class="nav__brand">
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark"
+          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
+        <span class="nav__brand-fallback">SL</span>
+        <span class="nav__brand-text">Sky<em>Lab</em></span>
+      </a>
+      <div class="nav__links">
+        <a href="../home.html">Dashboard</a>
+        <a href="technical-control.html">Reparos</a>
+        <a href="inventory.html">Estoque</a>
+        <a href="billing.html">Financeiro</a>
+      </div>
+      <div class="nav__right">
+        <a href="../home.html" class="btn btn--nav">← Voltar</a>
+        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="nav__mobile" id="navMobile">
+      <a href="../home.html">Dashboard</a>
+      <a href="technical-control.html">Controle Técnico</a>
+      <a href="inventory.html">Estoque</a>
+      <a href="billing.html">Cobranças</a>
+      <a href="warranty.html">Garantias</a>
+      <a href="analytics.html">Análises</a>
+      <a href="settings.html">Configurações</a>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="container">
+      <div class="page-header reveal">
+        <h1 class="page-header__title">Tabela de Preços</h1>
+        <p class="page-header__desc">Consulte e gerencie sua tabela de preços de serviços.</p>
+      </div>
+
+      <div class="placeholder-card reveal" style="--index:1">
+        <div class="placeholder-card__icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
+        </div>
+        <h2 class="placeholder-card__title">Preços & Serviços</h2>
+        <p class="placeholder-card__desc">Conecte ao Firebase para manter uma tabela atualizada de preços, categorias e margens de lucro.</p>
+        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
+      </div>
+
+      <!-- ═══════════════════════════════════════════
+           🔥 FIREBASE: Prices CRUD
+           Coleção: users/{uid}/prices
+
+           Imports necessários:
+           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
+             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+           Exemplo de escrita:
+           await addDoc(collection(db, "users", user.uid, "prices"), {
+             service: "Troca de tela iPhone 14",
+             category: "Telas",
+             cost: 180,
+             price: 350,
+             createdAt: serverTimestamp()
+           });
+           ═══════════════════════════════════════════ -->
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
+    const toggle = document.getElementById('navToggle');
+    const mobile = document.getElementById('navMobile');
+    toggle?.addEventListener('click', () => { mobile.classList.toggle('is-open'); toggle.classList.toggle('is-active'); });
+    const obs = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
+    }), { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>

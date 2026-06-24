@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyLab TecGestor — Análise Detalhada</title>
+  <meta name="description" content="Visualize o crescimento e performance da sua loja com o SkyLab TecGestor." />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="../home.html" class="nav__brand">
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark"
+          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
+        <span class="nav__brand-fallback">SL</span>
+        <span class="nav__brand-text">Sky<em>Lab</em></span>
+      </a>
+      <div class="nav__links">
+        <a href="../home.html">Dashboard</a>
+        <a href="technical-control.html">Reparos</a>
+        <a href="inventory.html">Estoque</a>
+        <a href="billing.html">Financeiro</a>
+      </div>
+      <div class="nav__right">
+        <a href="../home.html" class="btn btn--nav">← Voltar</a>
+        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="nav__mobile" id="navMobile">
+      <a href="../home.html">Dashboard</a>
+      <a href="technical-control.html">Controle Técnico</a>
+      <a href="inventory.html">Estoque</a>
+      <a href="billing.html">Cobranças</a>
+      <a href="warranty.html">Garantias</a>
+      <a href="analytics.html">Análises</a>
+      <a href="settings.html">Configurações</a>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="container">
+      <div class="page-header reveal">
+        <h1 class="page-header__title">Análise Detalhada</h1>
+        <p class="page-header__desc">Visualize o crescimento e performance da sua loja.</p>
+      </div>
+
+      <div class="placeholder-card reveal" style="--index:1">
+        <div class="placeholder-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h2 class="placeholder-card__title">Dashboard de Análises</h2>
+        <p class="placeholder-card__desc">Conecte ao Firebase para gerar gráficos de faturamento, volume de serviços, peças mais usadas e tendências.</p>
+        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
+      </div>
+
+      <!-- ═══════════════════════════════════════════
+           🔥 FIREBASE: Analytics Read
+           Coleção: users/{uid}/services + sales + inventory
+           
+           Imports necessários:
+           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
+             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+           
+           Exemplo de leitura:
+           const snap = await getDocs(collection(db, "users", user.uid, "services + sales + inventory"));
+           snap.forEach(doc => { console.log(doc.id, doc.data()); });
+           
+           Exemplo de escrita:
+           await addDoc(collection(db, "users", user.uid, "services + sales + inventory"), {
+             // campos do documento
+             createdAt: serverTimestamp()
+           });
+           ═══════════════════════════════════════════ -->
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
+  </footer>
+
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
+    // Mobile toggle
+    const toggle = document.getElementById('navToggle');
+    const mobile = document.getElementById('navMobile');
+    toggle?.addEventListener('click', () => {
+      mobile.classList.toggle('is-open');
+      toggle.classList.toggle('is-active');
+    });
+    // Reveal
+    const obs = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
+    }), { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>

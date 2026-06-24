@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SkyLab TecGestor — Dashboard</title>
+  <meta name="description" content="SkyLab TecGestor — Painel de gestão para assistência técnica. Controle de OS, estoque, garantias e mais." />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+
+  <!-- Auth Guard Overlay -->
+  <div id="auth-guard" class="auth-overlay" style="display:none">
+    <div class="auth-loader"></div>
+  </div>
+
+  <!-- ═══════ BANNER ═══════ -->
+  <div id="plan-banner" class="banner hidden" role="alert">
+    <p><span class="banner__dot"></span> <span id="plan-banner-text">Seu plano expira em breve. Considere renovar.</span></p>
+    <button class="banner__close" id="plan-banner-close" aria-label="Fechar aviso">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+    </button>
+  </div>
+
+  <!-- ═══════ NAVBAR ═══════ -->
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <!-- Brand -->
+      <a href="home.html" class="nav__brand" id="nav-brand">
+        <img src="assets/logo.png" alt="SkyLab" class="nav__brand-mark"
+          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
+        <span class="nav__brand-fallback">SL</span>
+        <div>
+          <span class="nav__brand-text">Sky<em>Lab</em></span>
+          <span id="header-store-name" class="nav__brand-sub"></span>
+        </div>
+      </a>
+
+      <!-- Desktop Links -->
+      <div class="nav__links">
+        <a href="pages/technical-control.html">Reparos</a>
+        <a href="pages/inventory.html">Estoque</a>
+        <a href="pages/billing.html">Financeiro</a>
+        <a href="pages/warranty.html">Garantias</a>
+      </div>
+
+      <!-- Right Actions -->
+      <div class="nav__right">
+        <span class="status-pill">
+          <span class="status-pill__dot"></span> Online
+        </span>
+
+        <!-- Notifications -->
+        <button class="nav__icon-btn" id="notif-btn" title="Notificações" aria-label="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span id="notif-badge" class="nav__badge hidden"></span>
+        </button>
+
+        <!-- Dark Mode Toggle -->
+        <button class="nav__icon-btn" id="theme-toggle" title="Alternar tema" aria-label="Alternar tema">
+          <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <svg id="icon-sun" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+
+        <!-- Menu Grid -->
+        <button class="nav__icon-btn" id="menu-btn" title="Menu" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        </button>
+
+        <!-- Mobile Toggle -->
+        <button class="nav__toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <!-- ═══════ DROPDOWN MENU ═══════ -->
+      <div id="dropdown-menu" class="dropdown">
+        <a href="pages/analytics.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+          <span>Análise detalhada</span>
+        </a>
+        <a href="pages/my-sales.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Minhas vendas</span>
+        </a>
+        <a href="pages/orcamentos.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          <span>Orçamentos</span>
+          <span class="dropdown__badge" style="background:rgba(6,182,212,.12);color:var(--cyan)">BETA</span>
+        </a>
+        <a href="pages/technical-control.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg>
+          <span>Controle Técnico</span>
+        </a>
+        <a href="pages/warranty.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Garantias</span>
+        </a>
+        <a href="pages/inventory.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          <span>Estoque de Peças</span>
+        </a>
+        <a href="pages/billing.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          <span>Gestão de Cobranças</span>
+        </a>
+        <a href="pages/price.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
+          <span>Tabela de Preços</span>
+        </a>
+        <a href="pages/film.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+          <span>Películas compatíveis</span>
+        </a>
+        <div class="dropdown__divider"></div>
+        <a href="pages/suggestions.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          <span>Sugerir uma ideia</span>
+        </a>
+        <a href="pages/settings.html" class="dropdown__item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Configurações</span>
+        </a>
+        <div class="dropdown__divider"></div>
+        <button id="logout-btn" class="dropdown__item dropdown__item--danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+          <span>Encerrar Sessão</span>
+        </button>
+      </div>
+
+      <!-- ═══════ NOTIFICATIONS PANEL ═══════ -->
+      <div id="notif-panel" class="notif-panel">
+        <div class="notif-panel__header">
+          <h3>Notificações</h3>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span id="notif-count" class="notif-panel__count">0</span>
+            <button id="mark-all-read" class="notif-panel__clear">Limpar</button>
+          </div>
+        </div>
+        <div class="notif-panel__tabs">
+          <button id="tab-admin" class="notif-panel__tab" data-tab="admin">
+            Administração <span id="tab-admin-count" class="notif-panel__tab-count">0</span>
+          </button>
+          <button id="tab-sistema" class="notif-panel__tab is-active" data-tab="sistema">
+            Sistema <span id="tab-sistema-count" class="notif-panel__tab-count">0</span>
+          </button>
+        </div>
+        <div id="notif-list" class="notif-panel__list">
+          <p style="text-align:center;font-size:.82rem;color:var(--text-3);padding:40px 0;">Sem novidades no momento.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="nav__mobile" id="navMobile">
+      <a href="pages/technical-control.html">Controle Técnico</a>
+      <a href="pages/inventory.html">Estoque de Peças</a>
+      <a href="pages/billing.html">Gestão de Cobranças</a>
+      <a href="pages/warranty.html">Garantias</a>
+      <a href="pages/analytics.html">Análise detalhada</a>
+      <a href="pages/settings.html">Configurações</a>
+      <div class="nav__mobile-ctas">
+        <a href="https://wa.me/5500000000000?text=Olá! Preciso de suporte." class="btn btn--whatsapp" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.11.546 4.094 1.502 5.822L0 24l6.335-1.458A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.934 0-3.753-.52-5.322-1.427l-.382-.225-3.76.986.988-3.674-.248-.394A9.934 9.934 0 0 1 2 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+          Falar com Suporte
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════ MAIN CONTENT ═══════ -->
+  <main style="flex:1; position:relative; z-index:1; padding-top:24px; padding-bottom:40px;">
+    <div class="container">
+
+      <!-- ── Global Search ── -->
+      <div class="search-wrap reveal" id="global-search-wrapper" style="margin-bottom:32px;">
+        <div class="search-wrap__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <input id="global-search-input" type="search" autocomplete="off"
+          placeholder="Buscar OS, cliente, peça, garantia, IMEI, telefone..."
+          class="input input--search input--lg" />
+        <div id="global-search-panel" class="search-panel"></div>
+        <p style="margin-top:10px;text-align:center;font-size:.72rem;color:var(--text-3);">
+          Pesquise em todo o sistema.
+          <kbd style="padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.06);border:1px solid var(--border);font-family:var(--f-mono);font-size:.6rem;">Ctrl K</kbd>
+        </p>
+      </div>
+
+      <!-- ── Hero Section ── -->
+      <div class="hero reveal" style="--index:1">
+        <div class="hero__badge">SkyLab TecGestor v1.0</div>
+        <h1 class="hero__title">
+          O cérebro da sua<br/>
+          <span>Assistência</span>
+        </h1>
+        <p class="hero__subtitle">
+          Sincronização em tempo real entre bancada e recepção. Controle de peças, ordens de serviço e garantias em um só lugar.
+        </p>
+        <div class="hero__actions" id="home-quick-actions">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+
+      <!-- ── Customize Banner ── -->
+      <div id="home-customize-banner" class="customize-banner hidden reveal" style="--index:2">
+        <div class="customize-banner__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+        </div>
+        <div class="customize-banner__body">
+          <h4>Personalize seus atalhos da Home</h4>
+          <p>Configure os botões e cards para acessar rapidamente o que mais usa. As alterações são salvas automaticamente.</p>
+        </div>
+        <div class="customize-banner__actions">
+          <button id="home-customize-open" class="btn btn--primary btn--sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Configurar
+          </button>
+          <button id="home-customize-dismiss" class="customize-banner__dismiss">Dispensar</button>
+        </div>
+      </div>
+
+      <!-- ── Dashboard Grid ── -->
+      <div class="reveal" style="--index:3; margin-top:48px;">
+        <div class="edit-bar">
+          <button id="home-edit-btn" class="edit-bar__btn hidden">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            Editar atalhos
+          </button>
+        </div>
+        <div id="home-dashboard-grid" class="dashboard-grid">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer class="footer">
+    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
+    <div id="footer-work-hours" class="footer__hours hidden"></div>
+  </footer>
+
+  <!-- ═══════ ANNOUNCEMENT MODAL ═══════ -->
+  <div id="announcement-overlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal__gradient-bar"></div>
+      <button class="modal__close" id="announcement-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+      </button>
+      <div class="modal__body">
+        <div class="modal__icon" style="background:rgba(43,98,232,.15);color:var(--blue-bright)">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+        </div>
+        <h2 class="modal__title">Aviso Importante</h2>
+        <p id="announcement-text" class="modal__text"></p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a id="announcement-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn--primary hidden" style="width:100%;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+            <span id="announcement-btn-text">Saiba Mais</span>
+          </a>
+          <button id="announcement-dismiss" class="btn btn--ghost" style="width:100%;">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ EDIT SHORTCUTS MODAL ═══════ -->
+  <div id="home-edit-modal" class="modal-overlay">
+    <div class="modal modal--edit">
+      <div class="modal__edit-header">
+        <div>
+          <h3>Personalizar atalhos da Home</h3>
+          <p>As alterações são salvas e ficam disponíveis sempre.</p>
+        </div>
+        <button id="home-edit-close" class="modal__close" style="position:static;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal__edit-content">
+        <p style="font-size:.72rem;color:var(--text-3);margin-top:-8px;">
+          Arraste para reordenar. Clique no item para editar. Use <strong>+ Adicionar</strong> para escolher páginas prontas.
+        </p>
+        <!-- Buttons Section -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <span class="modal__edit-section-title">Botões principais <span id="home-edit-bcount" style="opacity:.5;margin-left:4px;"></span></span>
+            <button id="home-add-button" class="btn btn--ghost btn--sm" style="padding:6px 12px;font-size:.7rem;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <div id="home-edit-buttons" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+        <!-- Cards Section -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <span class="modal__edit-section-title">Cards do dashboard <span id="home-edit-ccount" style="opacity:.5;margin-left:4px;"></span></span>
+            <button id="home-add-card" class="btn btn--ghost btn--sm" style="padding:6px 12px;font-size:.7rem;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <div id="home-edit-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+      <!-- Picker Sub-Modal -->
+      <div id="home-picker" class="modal-overlay" style="z-index:10001;">
+        <div class="modal" style="max-width:600px;">
+          <div class="modal__edit-header">
+            <h3 style="font-size:.92rem;">Escolha uma página</h3>
+            <button id="home-picker-close" class="modal__close" style="position:static;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+            </button>
+          </div>
+          <div style="padding:16px;">
+            <input id="home-picker-search" class="input" placeholder="Buscar página…" style="margin-bottom:12px;" />
+            <div id="home-picker-list" class="picker-grid"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div class="modal__footer">
+        <button id="home-edit-reset" class="btn btn--ghost btn--sm" style="margin-right:auto;">Restaurar padrão</button>
+        <button id="home-edit-cancel" class="btn btn--ghost btn--sm">Cancelar</button>
+        <button id="home-edit-save" class="btn btn--primary btn--sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ FAB WHATSAPP ═══════ -->
+  <div class="fab" id="fab-container">
+    <div id="fab-menu" class="fab__menu">
+      <a href="pages/suggestions.html" class="fab__menu-item" style="border-color:rgba(245,158,11,.25);">
+        <div class="fab__menu-item-icon fab__menu-item-icon--idea">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        </div>
+        <div>
+          <div class="fab__menu-item-title">Sugerir uma ideia</div>
+          <div class="fab__menu-item-sub">Compartilhe sua sugestão</div>
+        </div>
+      </a>
+      <a href="https://wa.me/5500000000000?text=Olá! Preciso de suporte." target="_blank" rel="noopener noreferrer" class="fab__menu-item">
+        <div class="fab__menu-item-icon fab__menu-item-icon--wa">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="fab__menu-item-title">Falar com o Suporte</div>
+      </a>
+      <a href="#" target="_blank" rel="noopener noreferrer" class="fab__menu-item">
+        <div class="fab__menu-item-icon fab__menu-item-icon--group">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="fab__menu-item-title">Grupo de Técnicos</div>
+          <div class="fab__menu-item-sub">Especialistas em Smartphones</div>
+        </div>
+      </a>
+    </div>
+    <button id="fab-btn" class="fab__btn" aria-label="Abrir menu de contato">
+      <span class="fab__badge">1</span>
+      <svg id="fab-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <svg id="fab-icon-close" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- ═══════ MAIN SCRIPT ═══════ -->
+  <script src="app.js"></script>
+</body>
+</html>
