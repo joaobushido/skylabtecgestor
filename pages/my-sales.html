@@ -4,99 +4,125 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkyLab TecGestor — Minhas Vendas</title>
-  <meta name="description" content="Histórico completo de vendas e faturamento da sua assistência técnica." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    .table-wrapper { overflow-x: auto; width: 100%; }
+    .os-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .os-table th { padding: 16px 12px; color: var(--text-2); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+    .os-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); font-size: 0.95rem; }
+    .os-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .action-btn:hover { background: var(--border); color: var(--text-1); }
+  </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="orb orb--a" aria-hidden="true"></div>
-  <div class="orb orb--b" aria-hidden="true"></div>
-  <div class="orb orb--c" aria-hidden="true"></div>
-
+  <div class="noise"></div><div class="orb orb--a"></div><div class="orb orb--b"></div><div class="orb orb--c"></div>
   <nav class="nav" id="nav">
     <div class="nav__inner">
       <a href="../home.html" class="nav__brand">
-        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark"
-          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
-        <span class="nav__brand-fallback">SL</span>
-        <span class="nav__brand-text">Sky<em>Lab</em></span>
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';" />
+        <span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span>
       </a>
-      <div class="nav__links">
-        <a href="../home.html">Dashboard</a>
-        <a href="technical-control.html">Reparos</a>
-        <a href="inventory.html">Estoque</a>
-        <a href="billing.html">Financeiro</a>
-      </div>
-      <div class="nav__right">
-        <a href="../home.html" class="btn btn--nav">← Voltar</a>
-        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-    <div class="nav__mobile" id="navMobile">
-      <a href="../home.html">Dashboard</a>
-      <a href="technical-control.html">Controle Técnico</a>
-      <a href="inventory.html">Estoque</a>
-      <a href="billing.html">Cobranças</a>
-      <a href="warranty.html">Garantias</a>
-      <a href="analytics.html">Análises</a>
-      <a href="settings.html">Configurações</a>
+      <div class="nav__links"><a href="../home.html">Dashboard</a></div>
+      <div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a></div>
     </div>
   </nav>
 
   <div class="page-content">
     <div class="container">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Minhas Vendas</h1>
-        <p class="page-header__desc">Histórico completo de vendas e faturamento.</p>
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div><h1 class="page-header__title">Minhas Vendas</h1><p class="page-header__desc">Histórico rápido de vendas de balcão.</p></div>
+        <button id="btn-new-sale" class="btn btn--primary">Nova Venda</button>
       </div>
 
-      <div class="placeholder-card reveal" style="--index:1">
-        <div class="placeholder-card__icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <div class="card" style="margin-top: 24px; padding: 0;">
+        <div class="table-wrapper">
+          <table class="os-table">
+            <thead>
+              <tr><th>Data</th><th>Produto / Serviço</th><th>Cliente</th><th>Valor (R$)</th><th style="text-align:right;">Ações</th></tr>
+            </thead>
+            <tbody id="sales-tbody"><tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-3);">Carregando...</td></tr></tbody>
+          </table>
         </div>
-        <h2 class="placeholder-card__title">Registro de Vendas</h2>
-        <p class="placeholder-card__desc">Conecte ao Firebase para registrar vendas, acompanhar faturamento diário e exportar relatórios.</p>
-        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
       </div>
-
-      <!-- ═══════════════════════════════════════════
-           🔥 FIREBASE: Sales CRUD
-           Coleção: users/{uid}/sales
-
-           Imports necessários:
-           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
-             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-           Exemplo de leitura:
-           const snap = await getDocs(query(collection(db, "users", user.uid, "sales"), orderBy("createdAt", "desc")));
-           snap.forEach(doc => { console.log(doc.id, doc.data()); });
-
-           Exemplo de escrita:
-           await addDoc(collection(db, "users", user.uid, "sales"), {
-             product: "Troca de tela iPhone 14",
-             price: 350.00,
-             client: "João Silva",
-             createdAt: serverTimestamp()
-           });
-           ═══════════════════════════════════════════ -->
     </div>
   </div>
 
-  <footer class="footer">
-    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
-  </footer>
+  <div id="sales-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px; width: 100%;">
+      <div class="modal__edit-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 id="modal-title" style="margin:0; font-size:1.1rem; color:var(--text-1);">Nova Venda</h3>
+        <button id="btn-close-modal" class="modal__close" style="position:static; margin:0; padding:4px;">✖</button>
+      </div>
+      <form id="sales-form" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <input type="hidden" id="sale-id" />
+        <div class="input-group" style="margin:0;"><label>Data da Venda</label><input type="date" id="s-date" class="input" required /></div>
+        <div class="input-group" style="margin:0;"><label>Produto / Serviço</label><input type="text" id="s-product" class="input" required /></div>
+        <div class="input-group" style="margin:0;"><label>Cliente (Opcional)</label><input type="text" id="s-client" class="input" placeholder="Consumidor Final" /></div>
+        <div class="input-group" style="margin:0;"><label>Valor Total (R$)</label><input type="number" id="s-amount" class="input" step="0.01" required /></div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" id="btn-cancel-modal" class="btn btn--ghost">Cancelar</button>
+          <button type="submit" id="btn-save" class="btn btn--primary">Registrar Venda</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <script>
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
-    const toggle = document.getElementById('navToggle');
-    const mobile = document.getElementById('navMobile');
-    toggle?.addEventListener('click', () => { mobile.classList.toggle('is-open'); toggle.classList.toggle('is-active'); });
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
-    }), { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og", authDomain: "tecgestor-skylab.firebaseapp.com", projectId: "tecgestor-skylab", storageBucket: "tecgestor-skylab.firebasestorage.app", messagingSenderId: "512077747740", appId: "1:512077747740:web:80bbef846cb4395f9ab1d9" };
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "../index.html"; else { currentUser = user; listenToSales(); } });
+
+    const tbody = document.getElementById('sales-tbody'); const modal = document.getElementById('sales-modal'); const form = document.getElementById('sales-form');
+
+    function formatDateToBR(dateStr) { if (!dateStr) return "-"; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
+
+    function listenToSales() {
+      const q = query(collection(db, "users", currentUser.uid, "sales"), orderBy("date", "desc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-3);">Nenhuma venda.</td></tr>`; return; }
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const s = docSnap.data();
+          html += `<tr>
+            <td>${formatDateToBR(s.date)}</td><td><strong style="color:var(--text-1);">${s.product}</strong></td><td>${s.client || 'Avulso'}</td>
+            <td><strong style="color:var(--emerald);">R$ ${Number(s.amount).toFixed(2).replace('.', ',')}</strong></td>
+            <td style="text-align:right;">
+              <button class="action-btn" onclick="window.editSale('${docSnap.id}', '${s.date}', '${s.product}', '${s.client}', '${s.amount}')">✏️</button>
+              <button class="action-btn" onclick="window.deleteSale('${docSnap.id}')">🗑️</button>
+            </td></tr>`;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openModal() { modal.classList.add('is-open'); }
+    function closeModal() { modal.classList.remove('is-open'); form.reset(); document.getElementById('sale-id').value = ''; }
+    document.getElementById('btn-new-sale').addEventListener('click', () => { closeModal(); openModal(); });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal); document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('sale-id').value;
+      const data = { date: document.getElementById('s-date').value, product: document.getElementById('s-product').value, client: document.getElementById('s-client').value, amount: Number(document.getElementById('s-amount').value) };
+      try {
+        if (id) await updateDoc(doc(db, "users", currentUser.uid, "sales", id), data);
+        else { data.createdAt = serverTimestamp(); await addDoc(collection(db, "users", currentUser.uid, "sales"), data); }
+        closeModal();
+      } catch (e) { alert("Erro ao salvar."); }
+    });
+
+    window.editSale = (id, date, product, client, amount) => {
+      document.getElementById('sale-id').value = id; document.getElementById('s-date').value = date; document.getElementById('s-product').value = product; document.getElementById('s-client').value = client !== 'undefined' ? client : ''; document.getElementById('s-amount').value = amount; openModal();
+    };
+    window.deleteSale = async (id) => { if (confirm("Apagar venda?")) await deleteDoc(doc(db, "users", currentUser.uid, "sales", id)); };
   </script>
 </body>
 </html>
