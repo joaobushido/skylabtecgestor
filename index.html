@@ -10,24 +10,33 @@
 </head>
 <body>
 
-  <!-- Ambient Background -->
   <div class="noise" aria-hidden="true"></div>
   <div class="orb orb--a" aria-hidden="true"></div>
   <div class="orb orb--b" aria-hidden="true"></div>
   <div class="orb orb--c" aria-hidden="true"></div>
 
-  <!-- Login Page -->
   <div class="login-page">
     <div class="login-card">
       <div class="login-card__logo">
         <img src="assets/logo.png" alt="SkyLab Assistência Técnica" />
       </div>
 
-      <h1 class="login-card__title">Bem-vindo de volta</h1>
-      <p class="login-card__subtitle">Acesse o painel de gestão da sua assistência técnica</p>
+      <h1 class="login-card__title" id="form-main-title">Bem-vindo de volta</h1>
+      <p class="login-card__subtitle" id="form-main-subtitle">Acesse o painel de gestão</p>
 
       <div id="login-error" class="login-card__error">
-        E-mail ou senha incorretos. Tente novamente.
+        Ocorreu um erro. Tente novamente.
+      </div>
+
+      <button type="button" id="google-login-btn" class="btn btn--secondary" style="width:100%; background: #ffffff; color: #333333; border: 1px solid #d1d5db; display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; font-weight: 500;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+        Continuar com o Google
+      </button>
+
+      <div style="display: flex; align-items: center; margin-bottom: 16px;">
+        <div style="flex: 1; height: 1px; background: var(--border);"></div>
+        <span style="padding: 0 10px; color: var(--text-3); font-size: 0.85rem;">ou use seu e-mail</span>
+        <div style="flex: 1; height: 1px; background: var(--border);"></div>
       </div>
 
       <form id="login-form" class="login-card__form" autocomplete="on">
@@ -47,12 +56,11 @@
         </button>
       </form>
 
-      <div class="login-card__footer">
+      <div id="login-footer" class="login-card__footer">
         Não tem conta?
         <a href="#" id="register-link">Criar conta</a>
       </div>
 
-      <!-- REGISTER FORM -->
       <form id="register-form" class="login-card__form hidden" autocomplete="on">
         <div class="input-group">
           <label for="register-name">Nome completo</label>
@@ -82,12 +90,12 @@
     </div>
   </div>
 
-  <!-- AQUI ENTRA O FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    // Suas credenciais
     const firebaseConfig = {
       apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og",
       authDomain: "tecgestor-skylab.firebaseapp.com",
@@ -101,7 +109,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Redireciona para a home se o usuário já estiver logado
+    // 1. Redireciona para a home se o usuário já estiver logado
     onAuthStateChanged(auth, (user) => {
       if (user) {
         window.location.href = "home.html";
@@ -113,12 +121,13 @@
     const registerLink = document.getElementById('register-link');
     const loginLink = document.getElementById('login-link');
     const loginError = document.getElementById('login-error');
+    const googleBtn = document.getElementById('google-login-btn');
     const registerFooter = document.getElementById('register-footer');
-    const loginFooter = document.querySelector('.login-card__footer');
-    const loginTitle = document.querySelector('.login-card__title');
-    const loginSubtitle = document.querySelector('.login-card__subtitle');
+    const loginFooter = document.getElementById('login-footer');
+    const formMainTitle = document.getElementById('form-main-title');
+    const formMainSubtitle = document.getElementById('form-main-subtitle');
 
-    // Alternar entre login e registro
+    // Alternar formulários E-mail/Senha
     registerLink.addEventListener('click', (e) => {
       e.preventDefault();
       loginForm.classList.add('hidden');
@@ -126,8 +135,8 @@
       registerForm.classList.remove('hidden');
       registerFooter.classList.remove('hidden');
       loginError.classList.remove('is-visible');
-      loginTitle.textContent = 'Criar conta';
-      loginSubtitle.textContent = 'Preencha os dados para começar a usar o sistema';
+      formMainTitle.textContent = 'Criar conta';
+      formMainSubtitle.textContent = 'Preencha os dados abaixo';
     });
 
     loginLink.addEventListener('click', (e) => {
@@ -137,39 +146,55 @@
       loginForm.classList.remove('hidden');
       loginFooter.classList.remove('hidden');
       loginError.classList.remove('is-visible');
-      loginTitle.textContent = 'Bem-vindo de volta';
-      loginSubtitle.textContent = 'Acesse o painel de gestão da sua assistência técnica';
+      formMainTitle.textContent = 'Bem-vindo de volta';
+      formMainSubtitle.textContent = 'Acesse o painel de gestão';
     });
 
-    // Função de Login no Firebase
+    // 2. Login com GOOGLE
+    const googleProvider = new GoogleAuthProvider();
+    googleBtn.addEventListener('click', async () => {
+      loginError.classList.remove('is-visible');
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        // Salva os dados do Google no banco de dados
+        await setDoc(doc(db, "users", result.user.uid), {
+          name: result.user.displayName,
+          email: result.user.email,
+          lastLogin: serverTimestamp()
+        }, { merge: true });
+        // O onAuthStateChanged lá em cima vai cuidar do redirecionamento!
+      } catch (error) {
+        console.error(error);
+        loginError.textContent = "Erro ao entrar com Google. Fechou a janela ou cancelou.";
+        loginError.classList.add('is-visible');
+      }
+    });
+
+    // 3. Login com E-mail
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-
       loginError.classList.remove('is-visible');
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        // O onAuthStateChanged lá em cima vai cuidar de redirecionar para home.html
       } catch (error) {
         loginError.textContent = getErrorMessage(error.code);
         loginError.classList.add('is-visible');
       }
     });
 
-    // Função de Criar Conta no Firebase
+    // 4. Registro com E-mail
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('register-name').value;
       const email = document.getElementById('register-email').value;
       const password = document.getElementById('register-password').value;
-
       loginError.classList.remove('is-visible');
 
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-        // Salva o perfil do usuário no Banco de Dados
         await setDoc(doc(db, "users", cred.user.uid), {
           name: name,
           email: email,
@@ -181,7 +206,6 @@
       }
     });
 
-    // Tratamento de mensagens de erro
     function getErrorMessage(code) {
       const msgs = {
         'auth/invalid-email': 'E-mail inválido.',
