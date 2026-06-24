@@ -33,26 +33,12 @@
       <form id="login-form" class="login-card__form" autocomplete="on">
         <div class="input-group">
           <label for="login-email">E-mail</label>
-          <input
-            type="email"
-            id="login-email"
-            class="input"
-            placeholder="seu@email.com"
-            required
-            autocomplete="email"
-          />
+          <input type="email" id="login-email" class="input" placeholder="seu@email.com" required autocomplete="email" />
         </div>
 
         <div class="input-group">
           <label for="login-password">Senha</label>
-          <input
-            type="password"
-            id="login-password"
-            class="input"
-            placeholder="••••••••"
-            required
-            autocomplete="current-password"
-          />
+          <input type="password" id="login-password" class="input" placeholder="••••••••" required autocomplete="current-password" />
         </div>
 
         <button type="submit" id="login-submit" class="btn btn--primary" style="width:100%; margin-top: 8px;">
@@ -66,45 +52,21 @@
         <a href="#" id="register-link">Criar conta</a>
       </div>
 
-      <!-- ═══════════════════════════════════════════
-           REGISTER FORM (hidden by default)
-           ═══════════════════════════════════════════ -->
+      <!-- REGISTER FORM -->
       <form id="register-form" class="login-card__form hidden" autocomplete="on">
         <div class="input-group">
           <label for="register-name">Nome completo</label>
-          <input
-            type="text"
-            id="register-name"
-            class="input"
-            placeholder="Seu nome"
-            required
-            autocomplete="name"
-          />
+          <input type="text" id="register-name" class="input" placeholder="Seu nome" required autocomplete="name" />
         </div>
 
         <div class="input-group">
           <label for="register-email">E-mail</label>
-          <input
-            type="email"
-            id="register-email"
-            class="input"
-            placeholder="seu@email.com"
-            required
-            autocomplete="email"
-          />
+          <input type="email" id="register-email" class="input" placeholder="seu@email.com" required autocomplete="email" />
         </div>
 
         <div class="input-group">
           <label for="register-password">Senha</label>
-          <input
-            type="password"
-            id="register-password"
-            class="input"
-            placeholder="Mínimo 6 caracteres"
-            required
-            minlength="6"
-            autocomplete="new-password"
-          />
+          <input type="password" id="register-password" class="input" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password" />
         </div>
 
         <button type="submit" id="register-submit" class="btn btn--primary" style="width:100%; margin-top: 8px;">
@@ -120,32 +82,31 @@
     </div>
   </div>
 
-  <script>
-    // ═══════════════════════════════════════════════════════════
-    // 🔥 FIREBASE: Authentication
-    // Descomente e configure quando conectar ao Firebase
-    //
-    // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    // import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged }
-    //   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    //
-    // const firebaseConfig = {
-    //   apiKey: "SUA_API_KEY",
-    //   authDomain: "SEU_AUTH_DOMAIN",
-    //   projectId: "SEU_PROJECT_ID",
-    //   storageBucket: "SEU_STORAGE_BUCKET",
-    //   messagingSenderId: "SEU_SENDER_ID",
-    //   appId: "SEU_APP_ID"
-    // };
-    //
-    // const app = initializeApp(firebaseConfig);
-    // const auth = getAuth(app);
-    //
-    // // Redirect if already logged in
-    // onAuthStateChanged(auth, (user) => {
-    //   if (user) window.location.href = "home.html";
-    // });
-    // ═══════════════════════════════════════════════════════════
+  <!-- AQUI ENTRA O FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og",
+      authDomain: "tecgestor-skylab.firebaseapp.com",
+      projectId: "tecgestor-skylab",
+      storageBucket: "tecgestor-skylab.firebasestorage.app",
+      messagingSenderId: "512077747740",
+      appId: "1:512077747740:web:80bbef846cb4395f9ab1d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Redireciona para a home se o usuário já estiver logado
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "home.html";
+      }
+    });
 
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -157,7 +118,7 @@
     const loginTitle = document.querySelector('.login-card__title');
     const loginSubtitle = document.querySelector('.login-card__subtitle');
 
-    // Toggle between login and register
+    // Alternar entre login e registro
     registerLink.addEventListener('click', (e) => {
       e.preventDefault();
       loginForm.classList.add('hidden');
@@ -180,7 +141,7 @@
       loginSubtitle.textContent = 'Acesse o painel de gestão da sua assistência técnica';
     });
 
-    // Login form submit
+    // Função de Login no Firebase
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -188,28 +149,16 @@
 
       loginError.classList.remove('is-visible');
 
-      // ═══════════════════════════════════════════
-      // 🔥 FIREBASE: Sign In
-      // try {
-      //   await signInWithEmailAndPassword(auth, email, password);
-      //   window.location.href = "home.html";
-      // } catch (error) {
-      //   loginError.textContent = getErrorMessage(error.code);
-      //   loginError.classList.add('is-visible');
-      // }
-      // ═══════════════════════════════════════════
-
-      // DEMO: redirect direto (remover quando conectar Firebase)
-      if (email && password) {
-        localStorage.setItem('skylab_demo_user', JSON.stringify({ email, name: 'Usuário Demo' }));
-        window.location.href = 'home.html';
-      } else {
-        loginError.textContent = 'Preencha todos os campos.';
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // O onAuthStateChanged lá em cima vai cuidar de redirecionar para home.html
+      } catch (error) {
+        loginError.textContent = getErrorMessage(error.code);
         loginError.classList.add('is-visible');
       }
     });
 
-    // Register form submit
+    // Função de Criar Conta no Firebase
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('register-name').value;
@@ -218,47 +167,33 @@
 
       loginError.classList.remove('is-visible');
 
-      // ═══════════════════════════════════════════
-      // 🔥 FIREBASE: Create Account
-      // try {
-      //   const cred = await createUserWithEmailAndPassword(auth, email, password);
-      //   // Save user profile in Firestore
-      //   // await setDoc(doc(db, "users", cred.user.uid), {
-      //   //   name: name,
-      //   //   email: email,
-      //   //   createdAt: serverTimestamp()
-      //   // });
-      //   window.location.href = "home.html";
-      // } catch (error) {
-      //   loginError.textContent = getErrorMessage(error.code);
-      //   loginError.classList.add('is-visible');
-      // }
-      // ═══════════════════════════════════════════
-
-      // DEMO: redirect direto
-      if (name && email && password.length >= 6) {
-        localStorage.setItem('skylab_demo_user', JSON.stringify({ email, name }));
-        window.location.href = 'home.html';
-      } else {
-        loginError.textContent = 'Preencha todos os campos. A senha deve ter pelo menos 6 caracteres.';
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        // Salva o perfil do usuário no Banco de Dados
+        await setDoc(doc(db, "users", cred.user.uid), {
+          name: name,
+          email: email,
+          createdAt: serverTimestamp()
+        });
+      } catch (error) {
+        loginError.textContent = getErrorMessage(error.code);
         loginError.classList.add('is-visible');
       }
     });
 
-    // ═══════════════════════════════════════════
-    // 🔥 FIREBASE: Error Message Helper
-    // function getErrorMessage(code) {
-    //   const msgs = {
-    //     'auth/invalid-email': 'E-mail inválido.',
-    //     'auth/user-disabled': 'Conta desabilitada.',
-    //     'auth/user-not-found': 'Usuário não encontrado.',
-    //     'auth/wrong-password': 'Senha incorreta.',
-    //     'auth/email-already-in-use': 'Este e-mail já está em uso.',
-    //     'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
-    //   };
-    //   return msgs[code] || 'Erro ao autenticar. Tente novamente.';
-    // }
-    // ═══════════════════════════════════════════
+    // Tratamento de mensagens de erro
+    function getErrorMessage(code) {
+      const msgs = {
+        'auth/invalid-email': 'E-mail inválido.',
+        'auth/user-disabled': 'Conta desabilitada.',
+        'auth/user-not-found': 'Usuário não encontrado.',
+        'auth/invalid-credential': 'E-mail ou senha incorretos.',
+        'auth/wrong-password': 'Senha incorreta.',
+        'auth/email-already-in-use': 'Este e-mail já está em uso.',
+        'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+      };
+      return msgs[code] || 'Erro ao autenticar. Tente novamente.';
+    }
   </script>
 </body>
 </html>
