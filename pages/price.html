@@ -4,96 +4,126 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkyLab TecGestor — Tabela de Preços</title>
-  <meta name="description" content="Consulte e gerencie sua tabela de preços de serviços." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    .table-wrapper { overflow-x: auto; width: 100%; }
+    .os-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .os-table th { padding: 16px 12px; color: var(--text-2); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+    .os-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); font-size: 0.95rem; }
+    .os-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .action-btn:hover { background: var(--border); color: var(--text-1); }
+  </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="orb orb--a" aria-hidden="true"></div>
-  <div class="orb orb--b" aria-hidden="true"></div>
-  <div class="orb orb--c" aria-hidden="true"></div>
-
+  <div class="noise"></div><div class="orb orb--a"></div><div class="orb orb--b"></div><div class="orb orb--c"></div>
   <nav class="nav" id="nav">
     <div class="nav__inner">
       <a href="../home.html" class="nav__brand">
-        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark"
-          onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
-        <span class="nav__brand-fallback">SL</span>
-        <span class="nav__brand-text">Sky<em>Lab</em></span>
+        <img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';" />
+        <span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span>
       </a>
-      <div class="nav__links">
-        <a href="../home.html">Dashboard</a>
-        <a href="technical-control.html">Reparos</a>
-        <a href="inventory.html">Estoque</a>
-        <a href="billing.html">Financeiro</a>
-      </div>
-      <div class="nav__right">
-        <a href="../home.html" class="btn btn--nav">← Voltar</a>
-        <button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-    <div class="nav__mobile" id="navMobile">
-      <a href="../home.html">Dashboard</a>
-      <a href="technical-control.html">Controle Técnico</a>
-      <a href="inventory.html">Estoque</a>
-      <a href="billing.html">Cobranças</a>
-      <a href="warranty.html">Garantias</a>
-      <a href="analytics.html">Análises</a>
-      <a href="settings.html">Configurações</a>
+      <div class="nav__links"><a href="../home.html">Dashboard</a></div>
+      <div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a></div>
     </div>
   </nav>
 
   <div class="page-content">
     <div class="container">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Tabela de Preços</h1>
-        <p class="page-header__desc">Consulte e gerencie sua tabela de preços de serviços.</p>
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div><h1 class="page-header__title">Tabela de Preços</h1><p class="page-header__desc">Consulta rápida de valores de serviços.</p></div>
+        <button id="btn-new-price" class="btn btn--primary">Novo Serviço</button>
       </div>
 
-      <div class="placeholder-card reveal" style="--index:1">
-        <div class="placeholder-card__icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
+      <div class="card" style="margin-top: 24px; padding: 0;">
+        <div class="table-wrapper">
+          <table class="os-table">
+            <thead>
+              <tr><th>Serviço / Reparo</th><th>Categoria</th><th>Custo (R$)</th><th>Venda (R$)</th><th style="text-align:right;">Ações</th></tr>
+            </thead>
+            <tbody id="price-tbody"><tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-3);">Carregando...</td></tr></tbody>
+          </table>
         </div>
-        <h2 class="placeholder-card__title">Preços & Serviços</h2>
-        <p class="placeholder-card__desc">Conecte ao Firebase para manter uma tabela atualizada de preços, categorias e margens de lucro.</p>
-        <a href="../home.html" class="btn btn--primary btn--sm">← Voltar ao Dashboard</a>
       </div>
-
-      <!-- ═══════════════════════════════════════════
-           🔥 FIREBASE: Prices CRUD
-           Coleção: users/{uid}/prices
-
-           Imports necessários:
-           import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
-             from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-           Exemplo de escrita:
-           await addDoc(collection(db, "users", user.uid, "prices"), {
-             service: "Troca de tela iPhone 14",
-             category: "Telas",
-             cost: 180,
-             price: 350,
-             createdAt: serverTimestamp()
-           });
-           ═══════════════════════════════════════════ -->
     </div>
   </div>
 
-  <footer class="footer">
-    <p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p>
-  </footer>
+  <div id="price-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px; width: 100%;">
+      <div class="modal__edit-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 id="modal-title" style="margin:0; font-size:1.1rem; color:var(--text-1);">Novo Serviço</h3>
+        <button id="btn-close-modal" class="modal__close" style="position:static; margin:0; padding:4px;">✖</button>
+      </div>
+      <form id="price-form" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <input type="hidden" id="p-id" />
+        <div class="input-group" style="margin:0;"><label>Nome do Serviço</label><input type="text" id="p-service" class="input" placeholder="Ex: Troca de Tela iPhone 11" required /></div>
+        <div class="input-group" style="margin:0;"><label>Categoria</label><input type="text" id="p-cat" class="input" placeholder="Ex: Apple" required /></div>
+        <div style="display:flex; gap:16px;">
+          <div class="input-group" style="margin:0; flex:1;"><label>Preço de Custo</label><input type="number" id="p-cost" class="input" step="0.01" /></div>
+          <div class="input-group" style="margin:0; flex:1;"><label>Preço para Cliente</label><input type="number" id="p-price" class="input" step="0.01" required /></div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" id="btn-cancel-modal" class="btn btn--ghost">Cancelar</button>
+          <button type="submit" class="btn btn--primary">Salvar na Tabela</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <script>
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => nav.classList.toggle('is-scrolled', window.scrollY > 20), { passive: true });
-    const toggle = document.getElementById('navToggle');
-    const mobile = document.getElementById('navMobile');
-    toggle?.addEventListener('click', () => { mobile.classList.toggle('is-open'); toggle.classList.toggle('is-active'); });
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
-    }), { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAUaqWg7DPdHgRQh_6WhUayl8t8bLYI4og", authDomain: "tecgestor-skylab.firebaseapp.com", projectId: "tecgestor-skylab", storageBucket: "tecgestor-skylab.firebasestorage.app", messagingSenderId: "512077747740", appId: "1:512077747740:web:80bbef846cb4395f9ab1d9" };
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "../index.html"; else { currentUser = user; listenToPrices(); } });
+
+    const tbody = document.getElementById('price-tbody'); const modal = document.getElementById('price-modal'); const form = document.getElementById('price-form');
+
+    function listenToPrices() {
+      const q = query(collection(db, "users", currentUser.uid, "prices"), orderBy("category", "asc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-3);">Tabela vazia.</td></tr>`; return; }
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const p = docSnap.data();
+          html += `<tr>
+            <td><strong style="color:var(--text-1);">${p.service}</strong></td><td>${p.category}</td>
+            <td style="color:var(--text-3);">R$ ${Number(p.cost||0).toFixed(2).replace('.', ',')}</td>
+            <td><strong style="color:var(--emerald);">R$ ${Number(p.price||0).toFixed(2).replace('.', ',')}</strong></td>
+            <td style="text-align:right;">
+              <button class="action-btn" onclick="window.editPrice('${docSnap.id}', '${p.service}', '${p.category}', '${p.cost}', '${p.price}')">✏️</button>
+              <button class="action-btn" onclick="window.deletePrice('${docSnap.id}')">🗑️</button>
+            </td></tr>`;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openModal() { modal.classList.add('is-open'); }
+    function closeModal() { modal.classList.remove('is-open'); form.reset(); document.getElementById('p-id').value = ''; }
+    document.getElementById('btn-new-price').addEventListener('click', () => { closeModal(); openModal(); });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal); document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('p-id').value;
+      const data = { service: document.getElementById('p-service').value, category: document.getElementById('p-cat').value, cost: Number(document.getElementById('p-cost').value || 0), price: Number(document.getElementById('p-price').value || 0) };
+      try {
+        if (id) await updateDoc(doc(db, "users", currentUser.uid, "prices", id), data);
+        else { data.createdAt = serverTimestamp(); await addDoc(collection(db, "users", currentUser.uid, "prices"), data); }
+        closeModal();
+      } catch (e) { alert("Erro ao salvar."); }
+    });
+
+    window.editPrice = (id, s, c, cost, price) => {
+      document.getElementById('p-id').value = id; document.getElementById('p-service').value = s; document.getElementById('p-cat').value = c; document.getElementById('p-cost').value = cost; document.getElementById('p-price').value = price; openModal();
+    };
+    window.deletePrice = async (id) => { if (confirm("Apagar item da tabela?")) await deleteDoc(doc(db, "users", currentUser.uid, "prices", id)); };
   </script>
 </body>
 </html>
