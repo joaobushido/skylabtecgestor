@@ -3,76 +3,374 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyLab TecGestor — Gestão de Cobranças</title>
-  <meta name="description" content="Controle financeiro completo da sua assistência técnica." />
+  <title>SkyLab TecGestor — Gestão Financeira</title>
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
   <style>
-    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}.summary-card{padding:20px;border-radius:var(--r-m);text-align:center}.summary-card h4{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:8px}.summary-card .val{font-size:1.6rem;font-weight:900;font-family:var(--f-mono)}.sc-pending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)}.sc-pending .val{color:var(--amber)}.sc-paid{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)}.sc-paid .val{color:var(--emerald)}.sc-late{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15)}.sc-late .val{color:var(--red)}.b-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.b-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.b-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.b-table tr:hover td{background:rgba(255,255,255,.02)}.b-badge{padding:3px 10px;border-radius:999px;font-size:.65rem;font-weight:700;text-transform:uppercase;cursor:pointer}.b-pending{background:rgba(245,158,11,.12);color:var(--amber)}.b-paid{background:rgba(16,185,129,.12);color:var(--emerald)}.b-late{background:rgba(239,68,68,.12);color:var(--red)}.add-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.b-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}@media(max-width:768px){.add-form,.summary-grid{grid-template-columns:1fr}.b-table{display:block;overflow-x:auto}}
+    .fin-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;padding-top:8px}
+    .fin-header h1{font-size:1.1rem;font-weight:700;color:var(--text-1);margin:0}
+    .fin-header__sub{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan)}
+    .fin-header-actions{margin-left:auto;display:flex;gap:8px}
+    .btn-icon{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+    .btn-icon:hover{background:rgba(255,255,255,.08);color:var(--text-1)}
+    .btn-icon svg{width:16px;height:16px}
+
+    /* TAB BAR */
+    .tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+    .tab-item{padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-3);font-size:.83rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px;margin-bottom:-1px;font-family:var(--f-body)}
+    .tab-item.active{color:var(--blue-bright);border-bottom-color:var(--blue-bright)}
+    .tab-item svg{width:14px;height:14px}
+
+    /* SALDO CARD */
+    .saldo-wrap{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:20px;align-items:start}
+    .saldo-card{background:linear-gradient(135deg,#0a6e4f,#0fa968);border-radius:16px;padding:20px 24px;position:relative;overflow:hidden}
+    .saldo-card::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border:2px solid rgba(255,255,255,.12);border-radius:50%}
+    .saldo-card::before{content:'';position:absolute;right:20px;top:20px;width:80px;height:80px;border:2px solid rgba(255,255,255,.08);border-radius:50%}
+    .saldo-card__label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-bottom:8px}
+    .saldo-card__val{font-size:1.8rem;font-weight:900;font-family:var(--f-mono);color:#fff;margin-bottom:10px}
+    .saldo-card__badges{display:flex;gap:8px;flex-wrap:wrap}
+    .saldo-badge{padding:3px 10px;border-radius:999px;font-size:.65rem;font-weight:700;background:rgba(0,0,0,.2);color:rgba(255,255,255,.85)}
+    .saldo-badge--calc{background:rgba(0,0,0,.15)}
+    .status-criticos{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:16px;padding:16px 18px;min-width:200px}
+    .status-criticos__title{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:12px}
+    .sc-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
+    .sc-row__dot{width:8px;height:8px;border-radius:50%;margin-right:8px;flex-shrink:0}
+    .sc-row__label{font-size:.78rem;color:var(--text-2);flex:1}
+    .sc-row__val{font-family:var(--f-mono);font-size:.82rem;font-weight:700;color:var(--text-3)}
+
+    /* TOOLBAR */
+    .b-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .b-search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 14px;flex:1;max-width:400px;min-width:160px}
+    .b-search input{background:none;border:none;outline:none;color:var(--text-1);font-size:.83rem;font-family:var(--f-body);width:100%}
+    .b-search input::placeholder{color:var(--text-3)}
+    .b-search svg{color:var(--text-3);flex-shrink:0;width:15px;height:15px}
+    .btn-nova-cob{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--blue-core);border:none;border-radius:10px;color:#fff;font-size:.83rem;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;font-family:var(--f-body)}
+    .btn-nova-cob:hover{background:var(--blue-bright)}
+
+    /* FILTER CHIPS */
+    .filter-chips{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+    .f-chip{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:.75rem;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--f-body)}
+    .f-chip.active{background:var(--blue-core);border-color:var(--blue-core);color:#fff}
+    .f-chip:not(.active):hover{border-color:var(--border-hover);color:var(--text-1)}
+
+    /* BILLING CARDS */
+    .b-cards{display:flex;flex-direction:column;gap:8px}
+    .b-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:.2s}
+    .b-card:hover{border-color:var(--border-hover)}
+    .b-card__info{flex:1;min-width:0}
+    .b-card__client{font-size:.88rem;font-weight:700;color:var(--text-1)}
+    .b-card__desc{font-size:.75rem;color:var(--text-2);margin-top:2px}
+    .b-card__due{font-size:.72rem;color:var(--text-3);margin-top:4px}
+    .b-card__right{text-align:right;flex-shrink:0}
+    .b-card__amount{font-family:var(--f-mono);font-size:.9rem;font-weight:700}
+    .b-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.62rem;font-weight:700;text-transform:uppercase;margin-top:6px;cursor:pointer}
+    .b-badge--pending {background:rgba(245,158,11,.12);color:var(--amber)}
+    .b-badge--paid    {background:rgba(16,185,129,.12);color:var(--emerald)}
+    .b-badge--late    {background:rgba(239,68,68,.12);color:var(--red)}
+    .b-badge--week    {background:rgba(6,182,212,.12);color:var(--cyan)}
+    .b-card__actions{display:flex;gap:4px}
+    .b-act-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text-3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+    .b-act-btn:hover{background:rgba(255,255,255,.08);color:var(--text-1)}
+    .b-act-btn--del:hover{background:rgba(239,68,68,.08);color:var(--red)}
+    .b-act-btn svg{width:14px;height:14px}
+
+    /* EMPTY */
+    .b-empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+    .b-empty .icon{font-size:3rem;display:block;margin-bottom:12px}
+    .b-empty p{font-size:.88rem}
+    .b-empty__check{width:52px;height:52px;background:rgba(16,185,129,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+    .b-empty__check svg{width:24px;height:24px;color:var(--emerald)}
+    .b-empty__title{font-size:.95rem;font-weight:600;color:var(--text-2);margin-bottom:4px}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--void-card);border:1px solid var(--border-hover);border-radius:18px;width:100%;max-width:460px;margin:auto;box-shadow:0 24px 80px rgba(0,0,0,.7);transform:translateY(20px);transition:transform .2s}
+    .modal-overlay.open .modal{transform:translateY(0)}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--void-card);z-index:10;border-radius:18px 18px 0 0}
+    .modal-header h2{font-size:.95rem;font-weight:700;color:var(--text-1)}
+    .modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:.2s}
+    .modal-close:hover{background:rgba(255,255,255,.1);color:var(--text-1)}
+    .modal-body{padding:18px 20px}
+    .modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;border-radius:0 0 18px 18px}
+    .frow{margin-bottom:14px}
+    .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .flabel{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:5px;display:block}
+    .finput{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text-1);font-size:.85rem;font-family:var(--f-body);outline:none;transition:.2s}
+    .finput:focus{border-color:var(--blue-bright)}
+    .finput::placeholder{color:var(--text-3)}
+    select.finput{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6c8c' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+    @media(max-width:640px){.saldo-wrap{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.status-criticos{min-width:unset}}
   </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
   <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html" style="color:var(--text-1)">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
 
   <div class="page-content">
-    <div class="container" style="max-width:1100px;">
-      <div class="page-header reveal"><h1 class="page-header__title">Gestão de Cobranças</h1><p class="page-header__desc">Controle financeiro completo da sua assistência técnica.</p></div>
-      <div class="summary-grid reveal" style="--index:1">
-        <div class="summary-card sc-pending"><h4>Pendente</h4><div class="val" id="sum-pending">R$ 0,00</div></div>
-        <div class="summary-card sc-paid"><h4>Recebido</h4><div class="val" id="sum-paid">R$ 0,00</div></div>
-        <div class="summary-card sc-late"><h4>Atrasado</h4><div class="val" id="sum-late">R$ 0,00</div></div>
+    <div class="container" style="max-width:1040px;">
+
+      <div class="fin-header reveal" style="--index:1">
+        <a href="../home.html" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+        <div>
+          <h1>Gestão Financeira</h1>
+          <span class="fin-header__sub">Cobranças &amp; Pendências</span>
+        </div>
+        <div class="fin-header-actions">
+          <button class="btn-icon" title="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="btn-icon" title="Modo escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+        </div>
       </div>
-      <div class="card reveal" style="--index:2;cursor:default;margin-top:24px;">
-        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Nova Cobrança</h3>
-        <form id="b-form" class="add-form">
-          <div class="input-group"><label for="b-client">Cliente</label><input type="text" id="b-client" class="input" placeholder="Nome do cliente" required/></div>
-          <div class="input-group"><label for="b-desc">Descrição</label><input type="text" id="b-desc" class="input" placeholder="Troca de tela iPhone 14"/></div>
-          <div class="input-group"><label for="b-amount">Valor (R$)</label><input type="number" id="b-amount" class="input" placeholder="350.00" step="0.01" min="0" required/></div>
-          <div class="input-group"><label for="b-due">Vencimento</label><input type="date" id="b-due" class="input"/></div>
-          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Adicionar</button></div>
-        </form>
+
+      <!-- TAB BAR -->
+      <div class="tab-bar reveal" style="--index:2">
+        <button class="tab-item active" onclick="setTab('cobr')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          Cobranças
+        </button>
+        <button class="tab-item" onclick="setTab('hist')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+          Histórico
+        </button>
+        <button class="tab-item" onclick="setTab('clie')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Clientes
+        </button>
+        <button class="tab-item" onclick="setTab('loja')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Loja
+        </button>
       </div>
-      <div class="card reveal" style="--index:3;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
-        <div style="padding:20px 24px 0;"><h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Cobranças <span id="b-count" style="opacity:.5;margin-left:4px;"></span></h3></div>
-        <div id="b-list" style="overflow-x:auto;"><div class="b-empty">Carregando...</div></div>
+
+      <!-- SALDO + STATUS CRÍTICOS -->
+      <div class="saldo-wrap reveal" style="--index:3">
+        <div class="saldo-card">
+          <div class="saldo-card__label">Saldo Total Pendente</div>
+          <div class="saldo-card__val" id="saldo-val">R$ 0,00</div>
+          <div class="saldo-card__badges">
+            <span class="saldo-badge" id="saldo-count">0 COBRANÇAS</span>
+            <span class="saldo-badge saldo-badge--calc" id="saldo-status">SEM DADOS</span>
+          </div>
+        </div>
+        <div class="status-criticos">
+          <div class="status-criticos__title">Status Críticos</div>
+          <div class="sc-row"><span class="sc-row__dot" style="background:var(--red)"></span><span class="sc-row__label">Atrasadas</span><span class="sc-row__val" id="sc-late">0</span></div>
+          <div class="sc-row"><span class="sc-row__dot" style="background:var(--amber)"></span><span class="sc-row__label">Vencendo Hoje</span><span class="sc-row__val" id="sc-today">0</span></div>
+          <div class="sc-row"><span class="sc-row__dot" style="background:var(--blue-bright)"></span><span class="sc-row__label">Esta Semana</span><span class="sc-row__val" id="sc-week">0</span></div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="b-toolbar reveal" style="--index:4">
+        <div class="b-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" id="b-search" placeholder="Buscar por nome do cliente..." autocomplete="off" />
+        </div>
+        <button class="btn-nova-cob" onclick="openBillModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          Nova Cobrança
+        </button>
+      </div>
+
+      <!-- FILTER CHIPS -->
+      <div class="filter-chips reveal" style="--index:5">
+        <button class="f-chip active" onclick="setFilter('all',this)">Todas</button>
+        <button class="f-chip" onclick="setFilter('late',this)">Atrasadas</button>
+        <button class="f-chip" onclick="setFilter('today',this)">Hoje</button>
+        <button class="f-chip" onclick="setFilter('week',this)">Esta Semana</button>
+      </div>
+
+      <!-- LIST -->
+      <div class="b-cards reveal" id="b-list" style="--index:6">
+        <div class="b-empty"><span class="icon">⏳</span><p>Carregando cobranças...</p></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL Nova Cobrança -->
+  <div class="modal-overlay" id="bill-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nova Cobrança</h2>
+        <button class="modal-close" onclick="closeBillModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="frow"><label class="flabel">Cliente *</label><input class="finput" id="bf-client" placeholder="Nome do cliente" /></div>
+        <div class="frow"><label class="flabel">Descrição</label><input class="finput" id="bf-desc" placeholder="Ex: Troca de tela iPhone 14" /></div>
+        <div class="fgrid frow">
+          <div><label class="flabel">Valor (R$) *</label><input class="finput" id="bf-amount" type="number" placeholder="350,00" step="0.01" min="0" /></div>
+          <div><label class="flabel">Vencimento</label><input class="finput" id="bf-due" type="date" /></div>
+        </div>
+        <div class="frow"><label class="flabel">Status</label>
+          <select class="finput" id="bf-status">
+            <option value="Pendente">Pendente</option>
+            <option value="Pago">Pago</option>
+            <option value="Atrasado">Atrasado</option>
+            <option value="Vencendo Hoje">Vencendo Hoje</option>
+          </select>
+        </div>
+        <div class="frow"><label class="flabel">Observações</label><input class="finput" id="bf-obs" placeholder="Opcional..." /></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--ghost btn--sm" onclick="closeBillModal()">Cancelar</button>
+        <button class="btn btn--primary btn--sm" id="bill-save-btn" onclick="saveBill()">Salvar</button>
       </div>
     </div>
   </div>
+
   <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
 
   <script type="module">
     import { auth, db, doc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
-    let bills=[];
-    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-    function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('pt-BR')}catch{return d}}
-    function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+    let bills=[], filterMode='all', searchText='', uid, colRef;
+    const STATUSES=['Pendente','Pago','Atrasado','Vencendo Hoje'];
 
     window.addEventListener('skylab:ready',({detail:{user}})=>{
-      const uid=user.uid,colRef=collection(db,'users',uid,'billing');
-      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{bills=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
-      document.getElementById('b-form').addEventListener('submit',async(e)=>{
-        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
-        try{await addDoc(colRef,{client:document.getElementById('b-client').value.trim(),description:document.getElementById('b-desc').value.trim(),amount:parseFloat(document.getElementById('b-amount').value)||0,dueDate:document.getElementById('b-due').value,status:'Pendente',createdAt:serverTimestamp()});e.target.reset()}catch(err){alert('Erro: '+err.message)}btn.disabled=false;
+      uid=user.uid; colRef=collection(db,'users',uid,'billing');
+      onSnapshot(query(colRef,orderBy('createdAt','desc')),snap=>{
+        bills=snap.docs.map(d=>({id:d.id,...d.data()}));
+        render(); updateSaldo();
       });
+      document.getElementById('b-search').addEventListener('input',e=>{searchText=e.target.value.toLowerCase();render();});
     });
 
-    function badgeCls(s){const l=(s||'').toLowerCase();if(l==='pago')return'b-paid';if(l==='atrasado')return'b-late';return'b-pending'}
-    const STATUSES=['Pendente','Pago','Atrasado'];
+    /* ── TABS ── */
+    window.setTab=function(t){
+      document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+      event.target.closest('.tab-item').classList.add('active');
+      // Histórico / Clientes / Loja: placeholder
+      if(t!=='cobr'){document.getElementById('b-list').innerHTML=`<div class="b-empty"><span class="icon">🔜</span><p>Módulo ${t==='hist'?'Histórico':t==='clie'?'Clientes':'Loja'} em breve.</p></div>`;}
+      else render();
+    };
 
-    function render(){
-      const el=document.getElementById('b-list');
-      document.getElementById('b-count').textContent=`(${bills.length})`;
-      let pending=0,paid=0,late=0;
-      bills.forEach(b=>{const a=b.amount||0;const s=(b.status||'').toLowerCase();if(s==='pago')paid+=a;else if(s==='atrasado')late+=a;else pending+=a});
-      document.getElementById('sum-pending').textContent=fmtMoney(pending);
-      document.getElementById('sum-paid').textContent=fmtMoney(paid);
-      document.getElementById('sum-late').textContent=fmtMoney(late);
-      if(!bills.length){el.innerHTML='<div class="b-empty">Nenhuma cobrança cadastrada.</div>';return}
-      el.innerHTML=`<table class="b-table"><thead><tr><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Status</th><th></th></tr></thead><tbody>${bills.map(b=>`<tr><td style="color:var(--text-1);font-weight:600;">${esc(b.client)}</td><td>${esc(b.description)}</td><td style="font-family:var(--f-mono);">${fmtMoney(b.amount)}</td><td>${fmtDate(b.dueDate)}</td><td><span class="b-badge ${badgeCls(b.status)}" onclick="window.__cycleB('${b.id}')" title="Clique para alterar">${esc(b.status||'Pendente')}</span></td><td><button class="act-btn" onclick="window.__delB('${b.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td></tr>`).join('')}</tbody></table>`;
+    /* ── FILTER ── */
+    window.setFilter=function(mode,el){
+      filterMode=mode;
+      document.querySelectorAll('.f-chip').forEach(c=>c.classList.remove('active'));
+      el.classList.add('active');
+      render();
+    };
+
+    /* ── SALDO ── */
+    function updateSaldo(){
+      const pending=bills.filter(b=>b.status!=='Pago');
+      const total=pending.reduce((a,b)=>a+(b.amount||0),0);
+      const late=bills.filter(b=>isLate(b)).length;
+      const today=bills.filter(b=>isDueToday(b)).length;
+      const week=bills.filter(b=>isDueThisWeek(b)).length;
+      document.getElementById('saldo-val').textContent='R$ '+total.toFixed(2).replace('.',',');
+      document.getElementById('saldo-count').textContent=pending.length+' COBRANÇAS';
+      document.getElementById('saldo-status').textContent=total===0?'SEM DADOS':`TOTAL PENDENTE`;
+      document.getElementById('sc-late').textContent=late;
+      document.getElementById('sc-today').textContent=today;
+      document.getElementById('sc-week').textContent=week;
     }
-    window.__cycleB=async(id)=>{const b=bills.find(x=>x.id===id);if(!b)return;const idx=STATUSES.indexOf(b.status);const next=STATUSES[(idx+1)%STATUSES.length];try{const u=auth.currentUser;if(u)await updateDoc(doc(db,'users',u.uid,'billing',id),{status:next,updatedAt:serverTimestamp()})}catch(e){console.error(e)}};
-    window.__delB=async(id)=>{if(!confirm('Excluir cobrança?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'billing',id))}catch(e){console.error(e)}};
+
+    function isLate(b){ return b.dueDate && new Date(b.dueDate)<new Date() && b.status!=='Pago'; }
+    function isDueToday(b){ if(!b.dueDate) return false; const t=new Date().toISOString().split('T')[0]; return b.dueDate===t; }
+    function isDueThisWeek(b){
+      if(!b.dueDate) return false;
+      const now=new Date(),end=new Date(); end.setDate(end.getDate()+7);
+      const d=new Date(b.dueDate); return d>=now&&d<=end;
+    }
+
+    /* ── RENDER ── */
+    function render(){
+      let list=bills;
+      if(searchText) list=list.filter(b=>(b.client||'').toLowerCase().includes(searchText)||(b.description||'').toLowerCase().includes(searchText));
+      if(filterMode==='late')  list=list.filter(b=>isLate(b));
+      if(filterMode==='today') list=list.filter(b=>isDueToday(b));
+      if(filterMode==='week')  list=list.filter(b=>isDueThisWeek(b));
+      const el=document.getElementById('b-list');
+      if(!list.length){
+        el.innerHTML=filterMode==='all'&&!searchText
+          ?`<div class="b-empty"><div class="b-empty__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></div><div class="b-empty__title">Tudo em dia!</div><p>Você não possui cobranças pendentes no momento.</p></div>`
+          :`<div class="b-empty"><span class="icon">🔍</span><p>Nenhuma cobrança encontrada.</p></div>`;
+        return;
+      }
+      el.innerHTML=list.map(b=>{
+        const amt=b.amount||0;
+        const bc=badgeCls(b.status,b);
+        return `<div class="b-card">
+          <div class="b-card__info">
+            <div class="b-card__client">${esc(b.client)}</div>
+            ${b.description?`<div class="b-card__desc">${esc(b.description)}</div>`:''}
+            ${b.dueDate?`<div class="b-card__due">Vence: ${fmtDate(b.dueDate)}</div>`:''}
+          </div>
+          <div class="b-card__right">
+            <div class="b-card__amount" style="color:${amt>0?'var(--emerald)':'var(--text-2)'}">${fmtMoney(amt)}</div>
+            <span class="b-badge ${bc.cls}" onclick="cycleStatus('${b.id}')" title="Clique para alterar">${esc(b.status||'Pendente')}</span>
+          </div>
+          <div class="b-card__actions">
+            <button class="b-act-btn b-act-btn--del" onclick="deleteBill('${b.id}')" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function badgeCls(s,b){
+      const l=(s||'').toLowerCase();
+      if(l==='pago')    return{cls:'b-badge--paid'};
+      if(l==='atrasado'||isLate(b)) return{cls:'b-badge--late'};
+      if(isDueToday(b)) return{cls:'b-badge--week'};
+      return{cls:'b-badge--pending'};
+    }
+
+    /* ── ACTIONS ── */
+    window.cycleStatus=async function(id){
+      const b=bills.find(x=>x.id===id); if(!b) return;
+      const idx=STATUSES.indexOf(b.status||'Pendente');
+      const next=STATUSES[(idx+1)%STATUSES.length];
+      try{ await updateDoc(doc(db,'users',uid,'billing',id),{status:next,updatedAt:serverTimestamp()}); }catch(e){console.error(e);}
+    };
+    window.deleteBill=async function(id){
+      if(!confirm('Excluir esta cobrança?')) return;
+      try{ await deleteDoc(doc(db,'users',uid,'billing',id)); }catch(e){alert('Erro: '+e.message);}
+    };
+
+    /* ── MODAL ── */
+    window.openBillModal=function(){
+      ['bf-client','bf-desc','bf-obs'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('bf-amount').value='';
+      document.getElementById('bf-due').value='';
+      document.getElementById('bf-status').value='Pendente';
+      document.getElementById('bill-modal').classList.add('open');
+      document.body.style.overflow='hidden';
+    };
+    window.closeBillModal=function(){
+      document.getElementById('bill-modal').classList.remove('open');
+      document.body.style.overflow='';
+    };
+    document.getElementById('bill-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeBillModal();});
+    window.saveBill=async function(){
+      const client=document.getElementById('bf-client').value.trim();
+      const amount=parseFloat(document.getElementById('bf-amount').value)||0;
+      if(!client){alert('Informe o nome do cliente.');return;}
+      const btn=document.getElementById('bill-save-btn'); btn.disabled=true; btn.textContent='Salvando...';
+      try{
+        await addDoc(colRef,{
+          client, description:document.getElementById('bf-desc').value.trim(),
+          amount, dueDate:document.getElementById('bf-due').value,
+          status:document.getElementById('bf-status').value,
+          observations:document.getElementById('bf-obs').value.trim(),
+          createdAt:serverTimestamp()
+        });
+        closeBillModal();
+      }catch(err){alert('Erro: '+err.message);}
+      btn.disabled=false; btn.textContent='Salvar';
+    };
+
+    /* ── UTILS ── */
+    function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('pt-BR');}catch{return d;}}
+    function fmtMoney(v){return'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});}
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   </script>
 </body>
 </html>
