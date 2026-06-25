@@ -4,85 +4,445 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkyLab TecGestor — Películas Compatíveis</title>
-  <meta name="description" content="Base de dados de películas compatíveis por modelo de aparelho." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
   <style>
-    .f-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.f-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.f-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.f-table tr:hover td{background:rgba(255,255,255,.02)}.add-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.f-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}.brand-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.65rem;font-weight:700;background:rgba(43,98,232,.12);color:var(--blue-bright)}@media(max-width:768px){.add-form{grid-template-columns:1fr}.f-table{display:block;overflow-x:auto}}
+    .film-page{max-width:1040px;margin:0 auto;padding:20px 16px}
+    .film-logo{display:flex;align-items:center;gap:8px;margin-bottom:24px}
+    .film-logo img{width:32px;height:32px;border-radius:8px;object-fit:contain}
+    .film-logo__text{font-size:.75rem;font-weight:700;color:var(--text-2)}
+    .film-logo__sub{font-size:.6rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em}
+
+    .film-hero{text-align:center;margin-bottom:28px}
+    .film-hero h1{font-size:1.9rem;font-weight:800;color:var(--text-1);line-height:1.2;margin-bottom:10px}
+    .film-hero h1 span{color:var(--blue-bright)}
+    .film-hero p{font-size:.88rem;color:var(--text-2);max-width:480px;margin:0 auto}
+
+    .film-search-wrap{max-width:560px;margin:0 auto 12px;position:relative}
+    .film-search{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:13px 16px 13px 44px;color:var(--text-1);font-size:.95rem;font-family:var(--f-body);outline:none;transition:.2s}
+    .film-search:focus{border-color:var(--blue-bright);background:rgba(43,98,232,.05)}
+    .film-search::placeholder{color:var(--text-3)}
+    .film-search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-3);width:18px;height:18px}
+
+    .film-recents{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;font-size:.75rem;color:var(--text-3)}
+    .film-recent-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer;transition:.15s;color:var(--text-2);font-size:.72rem}
+    .film-recent-tag:hover{border-color:var(--blue-bright);color:var(--blue-bright)}
+
+    /* BRAND TABS */
+    .brand-tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+    .brand-tab{padding:7px 18px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:.8rem;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--f-body)}
+    .brand-tab.active{background:var(--blue-core);border-color:var(--blue-core);color:#fff}
+    .brand-tab:not(.active):hover{border-color:var(--border-hover);color:var(--text-1)}
+
+    /* INFO PANELS */
+    .film-info-row{display:grid;grid-template-columns:1fr 220px;gap:12px;margin-bottom:24px}
+    .film-how{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .film-how__icon{width:30px;height:30px;border-radius:8px;background:var(--blue-core);display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px}
+    .film-how__icon svg{width:16px;height:16px;color:#fff}
+    .film-how h3{font-size:.82rem;font-weight:700;color:var(--text-1);margin-bottom:6px}
+    .film-how p{font-size:.77rem;color:var(--text-2);line-height:1.5}
+    .film-how a{color:var(--blue-bright);font-weight:600}
+    .mold-guide{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .mold-guide__title{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:10px;text-align:center}
+    .mold-icons{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+    .mold-icon{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px}
+    .mold-phone{width:28px;height:46px;border:2px solid var(--border-hover);border-radius:6px;position:relative;background:rgba(255,255,255,.04)}
+    .mold-phone--notch::before{content:'';position:absolute;top:3px;left:50%;transform:translateX(-50%);width:12px;height:3px;background:var(--border-hover);border-radius:999px}
+    .mold-phone--furo::before{content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);width:5px;height:5px;background:var(--border-hover);border-radius:50%}
+    .mold-phone--gota::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:var(--border-hover);border-radius:50% 50% 50% 50% / 60% 60% 40% 40%}
+    .mold-phone--ilha::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:14px;height:5px;background:var(--border-hover);border-radius:4px}
+    .mold-label{font-size:.6rem;color:var(--text-3);font-weight:600;text-align:center}
+
+    /* BRAND SECTIONS */
+    .brand-section{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
+    .brand-section__header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+    .brand-section__info{display:flex;align-items:center;gap:10px}
+    .brand-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+    .brand-name{font-size:.9rem;font-weight:700;color:var(--text-1)}
+    .molde-count{font-size:.72rem;color:var(--text-2);background:rgba(255,255,255,.06);padding:3px 10px;border-radius:999px;font-weight:600}
+    .compat-note{display:flex;gap:8px;padding:10px 16px;background:rgba(245,158,11,.06);border-bottom:1px solid rgba(245,158,11,.15);font-size:.74rem;color:var(--amber)}
+    .compat-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px}
+
+    .compat-table{width:100%;border-collapse:collapse}
+    .compat-table th{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+    .compat-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+    .compat-table tr:last-child td{border-bottom:none}
+    .compat-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+    .molde-name{font-size:.85rem;font-weight:700;color:var(--text-1)}
+    .molde-size{font-size:.7rem;color:var(--text-3);margin-bottom:4px}
+    .cobre-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15);color:var(--emerald);border-radius:999px;padding:2px 10px;font-size:.62rem;font-weight:700;cursor:pointer;margin-top:4px}
+    .model-tags{display:flex;flex-wrap:wrap;gap:5px}
+    .model-tag{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;padding:2px 9px;font-size:.72rem;color:var(--text-1);font-weight:500}
+    .model-tag--primary{background:rgba(43,98,232,.1);border-color:rgba(43,98,232,.25);color:var(--blue-bright)}
+    .cross-tag{display:inline-block;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:6px;padding:2px 9px;font-size:.72rem;color:var(--purple);font-weight:500}
+    .mold-note{display:flex;gap:6px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--amber);margin-top:8px;line-height:1.4}
+    .mold-note svg{width:12px;height:12px;flex-shrink:0;margin-top:1px}
+    .copy-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text-3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+    .copy-btn:hover{background:rgba(255,255,255,.08);color:var(--text-1)}
+    .copy-btn svg{width:13px;height:13px}
+
+    /* SEARCH RESULTS */
+    .search-result-section{display:none}
+    .search-result-section.visible{display:block}
+    .brand-sections.hide-when-search{display:none}
+
+    .film-footer{text-align:center;padding:24px 0 8px;font-size:.7rem;color:var(--text-3);border-top:1px solid var(--border);margin-top:24px}
+    .film-footer a{color:var(--text-3)}
+
+    @media(max-width:640px){.film-info-row{grid-template-columns:1fr}.film-hero h1{font-size:1.4rem}.compat-table th:nth-child(3),.compat-table td:nth-child(3){display:none}}
   </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
   <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
 
   <div class="page-content">
-    <div class="container" style="max-width:1100px;">
-      <div class="page-header reveal"><h1 class="page-header__title">Películas Compatíveis</h1><p class="page-header__desc">Base de dados de películas compatíveis por modelo.</p></div>
+    <div class="film-page reveal">
 
-      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
-        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Adicionar Película</h3>
-        <form id="f-form" class="add-form">
-          <div class="input-group"><label for="f-model">Modelo do Aparelho</label><input type="text" id="f-model" class="input" placeholder="iPhone 14 Pro Max" required/></div>
-          <div class="input-group"><label for="f-brand">Marca</label><input type="text" id="f-brand" class="input" placeholder="Apple"/></div>
-          <div class="input-group"><label for="f-type">Tipo de Película</label><select id="f-type" class="input"><option value="Hidrogel">Hidrogel</option><option value="Vidro Temperado">Vidro Temperado</option><option value="Privacidade">Privacidade</option><option value="Fosca">Fosca</option><option value="Cerâmica">Cerâmica</option></select></div>
-          <div class="input-group"><label for="f-size">Tamanho</label><input type="text" id="f-size" class="input" placeholder='6.7"'/></div>
-          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Adicionar</button></div>
-        </form>
-      </div>
-
-      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
-        <div style="padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-          <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Catálogo <span id="f-count" style="opacity:.5;margin-left:4px;"></span></h3>
-          <input type="text" id="f-search" class="input" placeholder="Buscar modelo..." style="max-width:250px;padding:8px 14px;font-size:.82rem;"/>
+      <!-- Logo -->
+      <div class="film-logo">
+        <img src="../assets/logo.png" alt="SkyLab" onerror="this.style.display='none'" />
+        <div>
+          <div class="film-logo__text">SkyLab<strong style="color:var(--blue-bright)">Pro</strong></div>
+          <div class="film-logo__sub">Módulo de Compatibilidade</div>
         </div>
-        <div id="f-list" style="overflow-x:auto;"><div class="f-empty">Carregando...</div></div>
       </div>
+
+      <!-- Hero -->
+      <div class="film-hero">
+        <h1>Lista Oficial de <span>Compatibilidade</span></h1>
+        <p>Cruze dados entre dezenas de marcas. Descubra quais películas do seu stock servem noutros aparelhos e otimize o seu inventário instantaneamente.</p>
+      </div>
+
+      <!-- Search -->
+      <div class="film-search-wrap">
+        <svg class="film-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="film-search" id="film-search" placeholder="Ex: iPhone 13, Moto G30, A54..." autocomplete="off" />
+      </div>
+      <div class="film-recents" id="film-recents">
+        <span>↩ Recentes:</span>
+        <!-- populated by JS -->
+      </div>
+
+      <!-- Brand tabs -->
+      <div class="brand-tabs">
+        <button class="brand-tab active" onclick="setBrand('all',this)">Todas</button>
+        <button class="brand-tab" onclick="setBrand('apple',this)">Apple</button>
+        <button class="brand-tab" onclick="setBrand('samsung',this)">Samsung</button>
+        <button class="brand-tab" onclick="setBrand('motorola',this)">Motorola</button>
+        <button class="brand-tab" onclick="setBrand('xiaomi',this)">Xiaomi</button>
+        <button class="brand-tab" onclick="setBrand('ecras',this)">Ecrãs UV</button>
+      </div>
+
+      <!-- Info panels -->
+      <div class="film-info-row">
+        <div class="film-how">
+          <div class="film-how__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+          <h3>COMO FUNCIONA?</h3>
+          <p>Digite um modelo. O aparelho procurado fica a <a>Azul</a>. Todos os outros na mesma linha partilham o mesmo molde físico. Use a opção de cópia na tabela para partilhar com clientes.</p>
+        </div>
+        <div class="mold-guide">
+          <div class="mold-guide__title">Guia de Moldes Frontais</div>
+          <div class="mold-icons">
+            <div class="mold-icon"><div class="mold-phone mold-phone--notch"></div><div class="mold-label">Notch</div></div>
+            <div class="mold-icon"><div class="mold-phone mold-phone--furo"></div><div class="mold-label">Furo</div></div>
+            <div class="mold-icon"><div class="mold-phone mold-phone--gota"></div><div class="mold-label">Gota</div></div>
+            <div class="mold-icon"><div class="mold-phone mold-phone--ilha"></div><div class="mold-label">Ilha</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Results -->
+      <div id="search-results" class="search-result-section">
+        <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+          <span id="search-result-label" style="font-size:.82rem;color:var(--text-2)"></span>
+          <button onclick="clearSearch()" style="font-size:.75rem;color:var(--text-3);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Limpar</button>
+        </div>
+        <div id="search-results-content"></div>
+      </div>
+
+      <!-- Brand Sections -->
+      <div id="brand-sections">
+        <!-- Apple -->
+        <div class="brand-section" data-brand="apple">
+          <div class="brand-section__header">
+            <div class="brand-section__info">
+              <div class="brand-icon" style="background:#000;color:#fff;font-size:14px">🍎</div>
+              <span class="brand-name">Apple (iPhone e Watch)</span>
+            </div>
+            <span class="molde-count">11 Moldes Base</span>
+          </div>
+          <div class="compat-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg><span><strong>Nota de Estoque:</strong> Películas 100% transparentes (sem borda preta) têm maior flexibilidade de cruzamento entre gerações 13 e 15. As com borda preta exigem respeito ao design do recorte.</span></div>
+          <table class="compat-table">
+            <thead><tr><th>Estrutura / Molde</th><th>Compatibilidade Interna</th><th>Cruzamento Externo</th><th>Ações</th></tr></thead>
+            <tbody id="apple-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Samsung -->
+        <div class="brand-section" data-brand="samsung">
+          <div class="brand-section__header">
+            <div class="brand-section__info">
+              <div class="brand-icon" style="background:#1428A0;color:#fff;font-size:10px;font-weight:800">SAM</div>
+              <span class="brand-name">Samsung</span>
+            </div>
+            <span class="molde-count">9 Moldes Base</span>
+          </div>
+          <table class="compat-table">
+            <thead><tr><th>Estrutura / Molde</th><th>Compatibilidade Interna</th><th>Cruzamento Externo</th><th>Ações</th></tr></thead>
+            <tbody id="samsung-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Motorola -->
+        <div class="brand-section" data-brand="motorola">
+          <div class="brand-section__header">
+            <div class="brand-section__info">
+              <div class="brand-icon" style="background:#5C6BC0;color:#fff;font-size:18px">M</div>
+              <span class="brand-name">Motorola / Lenovo</span>
+            </div>
+            <span class="molde-count">6 Moldes Base</span>
+          </div>
+          <table class="compat-table">
+            <thead><tr><th>Estrutura / Molde</th><th>Compatibilidade Interna</th><th>Cruzamento Externo</th><th>Ações</th></tr></thead>
+          <tbody id="motorola-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Xiaomi -->
+        <div class="brand-section" data-brand="xiaomi">
+          <div class="brand-section__header">
+            <div class="brand-section__info">
+              <div class="brand-icon" style="background:#FF6900;color:#fff;font-size:14px;font-weight:900">Mi</div>
+              <span class="brand-name">Xiaomi / Redmi / POCO</span>
+            </div>
+            <span class="molde-count">4 Moldes Base</span>
+          </div>
+          <table class="compat-table">
+            <thead><tr><th>Estrutura / Molde</th><th>Compatibilidade Interna</th><th>Cruzamento Externo</th><th>Ações</th></tr></thead>
+          <tbody id="xiaomi-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Ecrãs UV -->
+        <div class="brand-section" data-brand="ecras" style="display:none">
+          <div class="brand-section__header">
+            <div class="brand-section__info">
+              <div class="brand-icon" style="background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;font-size:11px;font-weight:800">UV</div>
+              <span class="brand-name">Películas Ecrãs UV (Vidro Líquido)</span>
+            </div>
+            <span class="molde-count">Universal</span>
+          </div>
+          <div style="padding:20px 18px;font-size:.83rem;color:var(--text-2);line-height:1.6">
+            <p>As películas de ecrã UV são universais e não requerem molde específico. São aplicadas com luz UV e aderem a qualquer formato de tela. Compatíveis com <strong style="color:var(--text-1)">todos os modelos listados</strong> nesta base de dados.</p>
+            <br>
+            <p style="color:var(--text-3);font-size:.75rem">⚠ Cuidado com telas perfuradas (furo) e com sensor de Face ID — pode interferir na biometria se aplicada incorretamente.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="film-footer">&copy; 2026 TECGESTOR PRO ECOSYSTEM<br><a>Base de Dados de Supply Chain Inteligente</a></div>
+
     </div>
   </div>
-  <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
 
-  <script type="module">
-    import { auth, db, doc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
-    let films=[],filterText='';
-    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-    function norm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+  <script>
+    /* ── COMPAT DATA ── */
+    const DATA = {
+      apple: [
+        { name:'Clássico (4.7")', internal:['iPhone 6','6S','7','8','SE (2020)','SE (2022)'], cross:['Exclusivo Apple'], count:6 },
+        { name:'Plus (5.5")',       internal:['iPhone 6 Plus','6S Plus','7 Plus','8 Plus'],    cross:['Exclusivo Apple'], count:4 },
+        { name:'Mini (5.4")',       internal:['iPhone 12 Mini','13 Mini'],                      cross:['Exclusivo Apple'], count:2 },
+        { name:'OLED Base (5.8")',  internal:['iPhone X','XS','11 Pro'],                       cross:['Exclusivo Apple'], count:3 },
+        { name:'LCD/OLED G1 (6.1")',internal:['iPhone XR','11'],                               cross:['Exclusivo Apple'], count:2 },
+        { name:'Série 12 (6.1")',   internal:['iPhone 12','12 Pro'],                           cross:['Exclusivo Apple'], count:2, note:'Telas perfeitamente planas (Ceramic Shield). Limpeza redobrada necessária nas extremidades.' },
+        { name:'Notch Padrão (6.1")',internal:['iPhone 13','13 Pro','14'],                     cross:['Exclusivo Apple'], count:3 },
+        { name:'Ilha Dinâmica (6.1")',internal:['iPhone 14 Pro','15','15 Pro','16'],            cross:['Exclusivo Apple'], count:4, note:'Atenção redobrada ao alinhamento do sensor TrueDepth para não afetar o Face ID.' },
+        { name:'Max/Plus Notch (6.7")',internal:['iPhone 12 Pro Max','13 Pro Max','14 Plus'],  cross:['Exclusivo Apple'], count:3 },
+        { name:'Max/Plus Ilha (6.7")',internal:['iPhone 14 Pro Max','15 Plus','15 Pro Max','16 Plus'],cross:['Exclusivo Apple'],count:4,note:'Atenção redobrada ao alinhamento do sensor TrueDepth para não afetar o Face ID.' },
+        { name:'Watch (40mm/44mm)', internal:['Série 4','Série 5','Série 6','SE'],             cross:['Exclusivo Apple'], count:4 }
+      ],
+      samsung: [
+        { name:'Intermediário Gota', internal:['A15','A24 (4G/5G)','A25 (4G/5G)','M34','A34 (4G/5G)','M15'], cross:['Oppo F19','OnePlus Nord 2','Realme 9','Vivo Y100'], count:6 },
+        { name:'Universal A05',      internal:['A05','A05s','A06','A06 5G','A06S','M14','A14'], cross:['Poco C65','Redmi 13C','Realme Note 50','C51','Moto G50','G20','G06'], count:7 },
+        { name:'Infinity-V Clássico',internal:['A12','M12','A03','A03s','A03 Core','A32 5G','A02','A13','A70'], cross:['Realme 7I','Moto G10','G20','G30','E7 Plus','Infinix Hot 30i'], count:9 },
+        { name:'Série A52 (Furo)',   internal:['A52','A52s 5G','A53','A51','A31','S20 FE','S20 Lite','M31s'], cross:['Moto G52','G84','Edge 30','Mi 11 Lite','Redmi Note 10S','Note 11','Realme 8'], count:8, note:'Biometria sob o ecrã. Aconselhe o cliente a recadastrar a impressão digital pós-instalação.' },
+        { name:'Infinity-U Clássico',internal:['A30s','A30','A50','A50s','A20','M21','M30','M31','F41','Note 8'], cross:['Moto One Zoom','G8 Play','One Macro','Redmi Note 7','Note 8','LG K22'], count:10 },
+        { name:'Micro-Bloco A04',    internal:['A04','A04s','A04e','A04 Core','A02 Core','A02s'], cross:['Moto G04','G73','G32','Série E14','Redmi Note 12'], count:6 },
+        { name:'Furo Lateral (A11)', internal:['A11','M11'], cross:['Moto G32','G71S','Redmi Note 11S','Poco M3 5G','Oppo F11 Pro','Vivo V15'], count:2 },
+        { name:'Premium Falso-Curvo',internal:['G52','G82','G84','G72','Edge 30'], cross:['Galaxy A52s 5G','S23+','S20 FE','Mi 11 Lite','Redmi Note 11'], count:5, note:'Painéis pOLED. Evite espalhar o adesivo pressionando as bordas com demasiada força.' },
+        { name:'Lançamentos 2026',   internal:['G15','G35','G75','G06'], cross:['G00 (Cruza com Redmi 14C)','G15 (Cruza com Realme C55)'], count:4 }
+      ],
+      motorola: [
+        { name:'G Padrão (Gota)',        internal:['G10','G20','G30','G50','E7 Plus','E7 Power','G9 Play'], cross:['Galaxy A02s','A03','A03s','A12','M12','Infinix Hot 10'], count:7 },
+        { name:'Entalhe Gota Antigo',    internal:['G8 Play','G7','G7 Plus','E6s','E6 Plus','One Macro'], cross:['Galaxy A10','A10s','M10','A30','A50','Redmi 8','LG K22'], count:6 },
+        { name:'Intermediário Compacto', internal:['G04','G04s','G24','G24 Power','G13','G23','G32','G73','E13','E14'], cross:['Galaxy A04','Redmi Note 12','Infinix Hot 50I/30','Poco X6'], count:10 },
+        { name:'Alta Atualização (Furo)',internal:['G54','G71','G62','G53','G32','G13','G22','G14'], cross:['Infinix Hot 30/40','Poco F5 Pro','Redmi Note 13','Note 30 Pro'], count:8 },
+        { name:'Premium Falso-Curvo',    internal:['G52','G82','G84','G72','Edge 30'], cross:['Galaxy A52s 5G','S23+','S20 FE','Mi 11 Lite','Redmi Note 11'], count:5, note:'Painéis pOLED. Evite espalhar o adesivo pressionando as bordas com demasiada força.' },
+        { name:'Lançamentos 2026',       internal:['G15','G35','G75','G06'], cross:['G00 (Cruza com Redmi 14C)','G15 (Cruza com Realme C55)'], count:4 }
+      ],
+      xiaomi: [
+        { name:'Super-Bloco Note 13',  internal:['Redmi Note 13 4G','Note 13 Pro 5G','Note 11 Pro','Note 11E Pro','Poco X4 Pro','X6','F5','Xiaomi 13T'], cross:['Infinix Note 30 Pro','Hot 40','Moto G54','G71S','Zenfone 7'], count:8, note:'Modelos Pro com sensor de digital no ecrã requerem pressão firme na zona biométrica ao colar.' },
+        { name:'Entrada Massiva 13C',  internal:['Redmi 13C','14C','A3','A4','Poco C65','C75'], cross:['Galaxy A05','A05s','A06','Realme Note 50','C51','Moto G06'], count:6 },
+        { name:'Histórico 8/7',        internal:['Redmi Note 8','Note 7','10A','9A','9C','Xiaomi Mi 8A','Poco C3'], cross:['Galaxy A20','A30','A50','Moto G7','G8 Play','Zenfone 8 Flip'], count:7 },
+        { name:'Evolutivo Note 12',    internal:['Redmi Note 12','Note 12 Explorer','Poco X5','M6 Pro'], cross:['Infinix Zero','Moto Edge 20 Lite'], count:4 }
+      ]
+    };
 
-    window.addEventListener('skylab:ready',({detail:{user}})=>{
-      const uid=user.uid,colRef=collection(db,'users',uid,'films');
-      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{films=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
+    let activeBrand='all', searchQ='', recents=JSON.parse(localStorage.getItem('film_recents')||'[]');
 
-      document.getElementById('f-form').addEventListener('submit',async(e)=>{
-        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
-        try{
-          await addDoc(colRef,{
-            model:document.getElementById('f-model').value.trim(),
-            brand:document.getElementById('f-brand').value.trim(),
-            filmType:document.getElementById('f-type').value,
-            size:document.getElementById('f-size').value.trim(),
-            createdAt:serverTimestamp()
-          });
-          e.target.reset();
-        }catch(err){alert('Erro: '+err.message)}
-        btn.disabled=false;
+    /* ── RENDER ALL ── */
+    function renderAll(){
+      renderBrand('apple');
+      renderBrand('samsung');
+      renderBrand('motorola');
+      renderBrand('xiaomi');
+      renderRecents();
+    }
+
+    function renderBrand(brand){
+      const tbody=document.getElementById(brand+'-tbody');
+      if(!tbody) return;
+      tbody.innerHTML=DATA[brand].map((m,i)=>rowHtml(brand,m,i)).join('');
+    }
+
+    function rowHtml(brand,m,idx){
+      const internalTags=m.internal.map(s=>`<span class="model-tag">${esc(s)}</span>`).join('');
+      const crossTags=m.cross.map(s=>`<span class="cross-tag">${esc(s)}</span>`).join('');
+      const noteHtml=m.note?`<div class="mold-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg><span>${esc(m.note)}</span></div>`:'' ;
+      const copyText=`${m.name}\nCompatível: ${m.internal.join(', ')}\nCruza com: ${m.cross.join(', ')}`;
+      return `<tr>
+        <td>
+          <div class="molde-name">${esc(m.name)}</div>
+          <span class="cobre-badge" title="Modelos internos">✓ COBRE ${m.count} MODELOS</span>
+          ${noteHtml}
+        </td>
+        <td><div class="model-tags">${internalTags}</div></td>
+        <td><div class="model-tags">${crossTags}</div></td>
+        <td>
+          <button class="copy-btn" onclick="copyMold(${JSON.stringify(copyText)})" title="Copiar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          </button>
+        </td>
+      </tr>`;
+    }
+
+    /* ── BRAND FILTER ── */
+    window.setBrand=function(brand,btn){
+      activeBrand=brand;
+      document.querySelectorAll('.brand-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.brand-section').forEach(s=>{
+        if(brand==='all') s.style.display='';
+        else s.style.display=s.dataset.brand===brand?'':'none';
       });
+    };
 
-      document.getElementById('f-search').addEventListener('input',(e)=>{filterText=e.target.value;render()});
+    /* ── SEARCH ── */
+    document.getElementById('film-search').addEventListener('input',function(){
+      searchQ=this.value.toLowerCase().trim();
+      if(!searchQ){ clearSearch(); return; }
+      doSearch(searchQ);
     });
 
-    function render(){
-      const el=document.getElementById('f-list');
-      const filtered=filterText?films.filter(f=>norm(f.model).includes(norm(filterText))||norm(f.brand).includes(norm(filterText))||norm(f.filmType).includes(norm(filterText))):films;
-      document.getElementById('f-count').textContent=`(${filtered.length}${filterText?' filtrado(s)':''})`;
-      if(!filtered.length){el.innerHTML=`<div class="f-empty">${filterText?'Nenhum resultado para a busca.':'Nenhuma película cadastrada.'}</div>`;return}
-      el.innerHTML=`<table class="f-table"><thead><tr><th>Modelo</th><th>Marca</th><th>Tipo</th><th>Tamanho</th><th></th></tr></thead><tbody>${filtered.map(f=>`<tr>
-        <td style="color:var(--text-1);font-weight:600;">${esc(f.model)}</td>
-        <td><span class="brand-tag">${esc(f.brand)}</span></td>
-        <td>${esc(f.filmType)}</td>
-        <td>${esc(f.size)}</td>
-        <td><button class="act-btn" onclick="window.__delF('${f.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td>
-      </tr>`).join('')}</tbody></table>`;
+    function doSearch(q){
+      const resultsEl=document.getElementById('search-results');
+      const contentEl=document.getElementById('search-results-content');
+      const labelEl=document.getElementById('search-result-label');
+      document.getElementById('brand-sections').style.display='none';
+      resultsEl.classList.add('visible');
+
+      // find matching rows
+      let found=[];
+      for(const [brand,rows] of Object.entries(DATA)){
+        for(const row of rows){
+          const allModels=[...row.internal,...row.cross];
+          const match=allModels.filter(m=>m.toLowerCase().includes(q));
+          if(match.length) found.push({brand,row,match});
+        }
+      }
+
+      if(!found.length){
+        labelEl.textContent=`Nenhum resultado para "${q}"`;
+        contentEl.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-3);font-size:.88rem">Nenhum molde encontrado para esse modelo.</div>`;
+        return;
+      }
+
+      // save recent
+      addRecent(document.getElementById('film-search').value.trim());
+      labelEl.textContent=`${found.length} molde(s) encontrado(s) para "${q}"`;
+
+      contentEl.innerHTML=found.map(({brand,row,match})=>{
+        const allInternal=row.internal.map(s=>{
+          const hl=s.toLowerCase().includes(q);
+          return `<span class="model-tag${hl?' model-tag--primary':''}">${esc(s)}</span>`;
+        }).join('');
+        const allCross=row.cross.map(s=>`<span class="cross-tag">${esc(s)}</span>`).join('');
+        const copyText=`${row.name}\nCompatível: ${row.internal.join(', ')}\nCruza com: ${row.cross.join(', ')}`;
+        const brandName={apple:'Apple',samsung:'Samsung',motorola:'Motorola',xiaomi:'Xiaomi'}[brand]||brand;
+        return `<div class="brand-section" style="margin-bottom:12px">
+          <div class="brand-section__header" style="padding:10px 14px">
+            <span class="brand-name" style="font-size:.82rem">${esc(brandName)} — ${esc(row.name)}</span>
+            <button class="copy-btn" onclick="copyMold(${JSON.stringify(copyText)})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>
+          </div>
+          <div style="padding:12px 14px">
+            <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--text-3);margin-bottom:6px">Compatibilidade Interna</div>
+            <div class="model-tags" style="margin-bottom:10px">${allInternal}</div>
+            <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--text-3);margin-bottom:6px">Cruzamento Externo</div>
+            <div class="model-tags">${allCross}</div>
+            ${row.note?`<div class="mold-note" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg><span>${esc(row.note)}</span></div>`:''}
+          </div>
+        </div>`;
+      }).join('');
     }
-    window.__delF=async(id)=>{if(!confirm('Excluir película?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'films',id))}catch(e){console.error(e)}};
+
+    window.clearSearch=function(){
+      document.getElementById('film-search').value='';
+      searchQ='';
+      document.getElementById('search-results').classList.remove('visible');
+      document.getElementById('brand-sections').style.display='';
+    };
+
+    /* ── RECENTS ── */
+    function addRecent(q){
+      if(!q) return;
+      recents=recents.filter(r=>r.toLowerCase()!==q.toLowerCase());
+      recents.unshift(q);
+      if(recents.length>6) recents=recents.slice(0,6);
+      localStorage.setItem('film_recents',JSON.stringify(recents));
+      renderRecents();
+    }
+    function renderRecents(){
+      const el=document.getElementById('film-recents');
+      if(!recents.length){el.style.display='none';return;}
+      el.style.display='flex';
+      el.innerHTML='<span>↩ Recentes:</span>'+recents.map(r=>`<span class="film-recent-tag" onclick="searchRecent('${esc(r)}')">${esc(r)}</span>`).join('');
+    }
+    window.searchRecent=function(q){
+      document.getElementById('film-search').value=q;
+      doSearch(q.toLowerCase());
+    };
+
+    /* ── COPY ── */
+    window.copyMold=function(text){
+      navigator.clipboard.writeText(text).then(()=>{
+        const t=document.createElement('div');
+        t.style.cssText='position:fixed;top:72px;right:16px;background:var(--emerald);color:#fff;padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:700;z-index:999';
+        t.textContent='✓ Copiado!';document.body.appendChild(t);
+        setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},2000);
+      });
+    };
+
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+    /* ── INIT ── */
+    renderAll();
+
+    /* Nav toggle */
+    document.getElementById('navToggle').addEventListener('click',()=>document.getElementById('navMobile').classList.toggle('open'));
   </script>
 </body>
 </html>
