@@ -4,77 +4,442 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkyLab TecGestor — Garantias</title>
-  <meta name="description" content="Acompanhe todas as garantias ativas dos seus serviços." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
   <style>
-    .w-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px}.w-table th{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}.w-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:var(--text-2)}.w-table tr:hover td{background:rgba(255,255,255,.02)}.w-badge{padding:3px 10px;border-radius:999px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}.w-active{background:rgba(16,185,129,.12);color:var(--emerald)}.w-expiring{background:rgba(245,158,11,.12);color:var(--amber)}.w-expired{background:rgba(239,68,68,.12);color:var(--red)}.add-form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:24px}.add-form--full{grid-column:1/-1}.act-btn{padding:6px;border-radius:6px;color:var(--text-3);transition:color .2s,background .2s}.act-btn:hover{color:var(--text-1);background:rgba(255,255,255,.06)}.act-btn svg{width:16px;height:16px}.w-empty{text-align:center;padding:60px 20px;color:var(--text-3);font-size:.88rem}@media(max-width:768px){.add-form{grid-template-columns:1fr}.w-table{display:block;overflow-x:auto}}
+    .gar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:8px}
+    .gar-header h1{font-size:1.1rem;font-weight:700;color:var(--text-1)}
+    .btn-nova-gar{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--blue-core);border:none;border-radius:10px;color:#fff;font-size:.83rem;font-weight:700;cursor:pointer;transition:.2s}
+    .btn-nova-gar:hover{background:var(--blue-bright)}
+
+    /* CARDS */
+    .gar-cards{display:flex;flex-direction:column;gap:10px}
+    .gar-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s}
+    .gar-card:hover{border-color:var(--border-hover)}
+    .gar-card__body{padding:14px 16px}
+    .gar-card__top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+    .gar-badge{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .gar-badge--active  {background:rgba(16,185,129,.12);color:var(--emerald)}
+    .gar-badge--expiring{background:rgba(245,158,11,.12);color:var(--amber)}
+    .gar-badge--expired {background:rgba(239,68,68,.12);color:var(--red)}
+    .gar-card__rm{background:none;border:none;color:var(--text-3);cursor:pointer;padding:4px;border-radius:6px;transition:.15s}
+    .gar-card__rm:hover{color:var(--red);background:rgba(239,68,68,.08)}
+    .gar-card__rm svg{width:16px;height:16px}
+    .gar-card__client{font-size:.9rem;font-weight:700;color:var(--text-1)}
+    .gar-card__device{font-size:.78rem;color:var(--text-2)}
+    .gar-card__svc{font-size:.75rem;color:var(--text-3);margin-top:4px}
+    .gar-card__dates{display:flex;gap:16px;margin-top:10px;font-size:.72rem;color:var(--text-3)}
+    .gar-card__dates strong{color:var(--text-2);display:block;font-size:.82rem}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--void-card);border:1px solid var(--border-hover);border-radius:18px;width:100%;max-width:500px;margin:auto;box-shadow:0 24px 80px rgba(0,0,0,.7);transform:translateY(20px);transition:transform .2s}
+    .modal-overlay.open .modal{transform:translateY(0)}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--void-card);z-index:10;border-radius:18px 18px 0 0}
+    .modal-header h2{font-size:.95rem;font-weight:700;color:var(--text-1)}
+    .modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;font-size:16px}
+    .modal-close:hover{background:rgba(255,255,255,.1);color:var(--text-1)}
+    .modal-body{padding:18px 20px;max-height:72vh;overflow-y:auto}
+    .modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--void-card);border-radius:0 0 18px 18px}
+
+    /* TABS inside modal */
+    .type-tabs{display:flex;gap:8px;margin-bottom:16px}
+    .type-tab{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text-2);font-size:.83rem;font-weight:600;cursor:pointer;text-align:center;transition:.2s;font-family:var(--f-body);display:flex;align-items:center;justify-content:center;gap:6px}
+    .type-tab.active{background:var(--blue-core);border-color:var(--blue-core);color:#fff}
+    .type-tab svg{width:16px;height:16px}
+
+    /* form */
+    .frow{margin-bottom:14px}
+    .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .flabel{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:5px;display:block}
+    .finput{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text-1);font-size:.85rem;font-family:var(--f-body);outline:none;transition:.2s}
+    .finput:focus{border-color:var(--blue-bright);background:rgba(43,98,232,.06)}
+    .finput::placeholder{color:var(--text-3)}
+    textarea.finput{resize:vertical;min-height:80px}
+    .input-add-row{display:flex;gap:6px}
+    .input-add-row .finput{flex:1}
+    .btn-add-svc{background:var(--blue-core);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--f-body)}
+    .svc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .svc-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(43,98,232,.12);color:var(--blue-bright);border:1px solid rgba(43,98,232,.2);border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:600}
+    .svc-tag button{background:none;border:none;color:currentColor;cursor:pointer;font-size:12px;padding:0;line-height:1}
+
+    .section-sep{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+    .section-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    .part-row{display:flex;gap:6px;margin-bottom:8px}
+    .part-row .finput{min-width:0}
+    .part-row .finput--sm{width:88px}
+    .btn-add-part{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:9px 13px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--f-body)}
+    .part-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+    .part-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:8px 12px}
+    .part-item__name{flex:1;font-size:.82rem;color:var(--text-1)}
+    .part-item__price{font-family:var(--f-mono);font-size:.78rem;color:var(--blue-bright)}
+    .part-item__rm{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1}
+    .part-item__rm:hover{color:var(--red)}
+
+    .fcheck-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:10px}
+    .fcheck-row input{accent-color:var(--blue-bright);width:15px;height:15px;flex-shrink:0;margin-top:1px}
+    .fcheck-row label{font-size:.83rem;font-weight:500;color:var(--text-1);cursor:pointer;flex:1}
+    .fcheck-row small{font-size:.7rem;color:var(--text-3);display:block}
+
+    .wa-text-box{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text-1);font-size:.8rem;font-family:var(--f-body);resize:vertical;min-height:80px;outline:none}
+    .wa-text-box:focus{border-color:var(--blue-bright)}
+    .save-default-link{font-size:.72rem;color:var(--emerald);cursor:pointer;float:right;margin-bottom:6px}
+
+    .photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px 12px;text-align:center;color:var(--text-3);font-size:.75rem;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:5px}
+    .photo-drop:hover{border-color:var(--blue-bright);color:var(--blue-bright);background:rgba(43,98,232,.05)}
+    .photo-drop--green{border-color:rgba(16,185,129,.3)}
+    .photo-drop--green:hover{border-color:var(--emerald);color:var(--emerald);background:rgba(16,185,129,.05)}
+    .photo-drop--red{border-color:rgba(239,68,68,.3)}
+    .photo-drop svg{width:22px;height:22px}
+    .photo-qr-btn{width:100%;background:var(--blue-core);color:#fff;border:none;border-radius:10px;padding:11px 14px;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-bottom:6px;font-family:var(--f-body)}
+
+    .info-box{display:flex;gap:8px;padding:9px 12px;border-radius:9px;font-size:.73rem;margin:6px 0 10px}
+    .info-box--cyan{background:rgba(6,182,212,.08);color:var(--cyan);border:1px solid rgba(6,182,212,.2)}
+    .info-box--green{background:rgba(16,185,129,.08);color:var(--emerald);border:1px solid rgba(16,185,129,.2)}
+
+    .gar-empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+    .gar-empty svg{width:48px;height:48px;margin:0 auto 12px;display:block;opacity:.3}
+    .gar-empty p{font-size:.88rem}
+    @media(max-width:640px){.fgrid,.fgrid3{grid-template-columns:1fr}.type-tabs{flex-direction:column}}
   </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div><div class="orb orb--a" aria-hidden="true"></div><div class="orb orb--b" aria-hidden="true"></div><div class="orb orb--c" aria-hidden="true"></div>
-  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html">Garantias</a><a href="settings.html">Configurações</a></div></nav>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="orb orb--a" aria-hidden="true"></div>
+  <div class="orb orb--b" aria-hidden="true"></div>
+  <div class="orb orb--c" aria-hidden="true"></div>
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="../home.html" class="nav__brand"><img src="../assets/logo.png" alt="SkyLab" class="nav__brand-mark" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"/><span class="nav__brand-fallback">SL</span><span class="nav__brand-text">Sky<em>Lab</em></span></a><div class="nav__links"><a href="../home.html">Dashboard</a><a href="technical-control.html">Reparos</a><a href="inventory.html">Estoque</a><a href="billing.html">Financeiro</a></div><div class="nav__right"><a href="../home.html" class="btn btn--nav">← Voltar</a><button class="nav__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button></div></div><div class="nav__mobile" id="navMobile"><a href="../home.html">Dashboard</a><a href="technical-control.html">Controle Técnico</a><a href="inventory.html">Estoque</a><a href="billing.html">Cobranças</a><a href="warranty.html" style="color:var(--blue-bright)">Garantias</a><a href="settings.html">Configurações</a></div></nav>
 
   <div class="page-content">
-    <div class="container" style="max-width:1100px;">
-      <div class="page-header reveal"><h1 class="page-header__title">Garantias</h1><p class="page-header__desc">Acompanhe todas as garantias ativas dos seus serviços.</p></div>
-      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
-        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Registrar Garantia</h3>
-        <form id="w-form" class="add-form">
-          <div class="input-group"><label for="w-client">Cliente</label><input type="text" id="w-client" class="input" placeholder="Nome do cliente" required/></div>
-          <div class="input-group"><label for="w-device">Aparelho</label><input type="text" id="w-device" class="input" placeholder="iPhone 14 Pro" required/></div>
-          <div class="input-group"><label for="w-os">Nº da OS</label><input type="text" id="w-os" class="input" placeholder="001"/></div>
-          <div class="input-group"><label for="w-type">Tipo de Serviço</label><input type="text" id="w-type" class="input" placeholder="Troca de tela"/></div>
-          <div class="input-group"><label for="w-start">Início</label><input type="date" id="w-start" class="input" required/></div>
-          <div class="input-group"><label for="w-end">Vencimento</label><input type="date" id="w-end" class="input" required/></div>
-          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;"><button type="submit" class="btn btn--primary btn--sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Registrar</button></div>
-        </form>
+    <div class="container" style="max-width:1040px;">
+
+      <div class="gar-header reveal" style="--index:1">
+        <div style="display:flex;align-items:center;gap:12px">
+          <a href="../home.html" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+          </a>
+          <h1>Garantias</h1>
+        </div>
+        <button class="btn-nova-gar" onclick="openGarModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          Nova Garantia
+        </button>
       </div>
-      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
-        <div style="padding:20px 24px 0;"><h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Garantias Registradas <span id="w-count" style="opacity:.5;margin-left:4px;"></span></h3></div>
-        <div id="w-list" style="overflow-x:auto;"><div class="w-empty">Carregando...</div></div>
+
+      <div class="gar-cards reveal" id="gar-list" style="--index:2">
+        <div class="gar-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg><p>Carregando garantias...</p></div>
       </div>
     </div>
   </div>
+
+  <!-- ═══════ MODAL ═══════ -->
+  <div class="modal-overlay" id="gar-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Registrar Garantia</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Type tabs -->
+        <div class="type-tabs">
+          <button class="type-tab active" id="tab-svc" onclick="setGarType('svc')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg>
+            SERVIÇO / PEÇA
+          </button>
+          <button class="type-tab" id="tab-vnd" onclick="setGarType('vnd')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            VENDA DE APARELHO
+          </button>
+        </div>
+
+        <!-- Dados cliente -->
+        <div class="fgrid frow">
+          <div><label class="flabel">Nome do Cliente *</label><input class="finput" id="gf-client" placeholder="Nome do Cliente" /></div>
+          <div><label class="flabel">WhatsApp (DDD+Num)</label><input class="finput" id="gf-wa" placeholder="5500000000000" type="tel" /></div>
+        </div>
+        <div class="fgrid frow">
+          <div><label class="flabel">Aparelho/Modelo</label><input class="finput" id="gf-device" placeholder="iPhone 14 Pro" /></div>
+          <div><label class="flabel">IMEI / Serial</label><input class="finput" id="gf-imei" placeholder="IMEI / Serial" /></div>
+        </div>
+        <div class="frow">
+          <label class="flabel">CPF (Opcional)</label>
+          <input class="finput" id="gf-cpf" placeholder="000.000.000-00" />
+        </div>
+        <div class="frow">
+          <label class="flabel">Adicionar Serviço</label>
+          <div class="input-add-row">
+            <input class="finput" id="gf-svc-input" placeholder="Ex: Troca de Tela" />
+            <button class="btn-add-svc" onclick="addGarSvc()">+</button>
+          </div>
+          <div class="svc-tags" id="gf-svc-tags"></div>
+        </div>
+        <div class="frow">
+          <label class="flabel">Vendedor Responsável</label>
+          <input class="finput" id="gf-vendor" placeholder="Nome do vendedor" />
+        </div>
+
+        <!-- Observações / Laudo -->
+        <div class="section-sep">📝 Observações / Laudo</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+          <span class="save-default-link" onclick="saveDefaultText()">💾 Salvar como padrão</span>
+        </div>
+        <textarea class="wa-text-box" id="gf-obs" placeholder="Detalhes sobre o estado do aparelho ou serviço..."></textarea>
+
+        <!-- Peças & Custos -->
+        <div class="section-sep">🔧 Peças & Custos</div>
+        <div class="part-row frow">
+          <input class="finput" id="gf-part-name" placeholder="Nome da peça" style="flex:1" />
+          <input class="finput finput--sm" id="gf-part-cost" placeholder="Custo R$" type="number" step="0.01" min="0" />
+          <input class="finput finput--sm" id="gf-part-sale" placeholder="Venda R$" type="number" step="0.01" min="0" />
+          <button class="btn-add-part" onclick="addGarPart()">+ Add</button>
+        </div>
+        <div class="part-list" id="gf-part-list"></div>
+
+        <!-- Garantia checkbox -->
+        <div class="fcheck-row">
+          <input type="checkbox" id="gf-has-gar" checked />
+          <label for="gf-has-gar">
+            <span>Este registro possui garantia</span>
+            <small>Desmarque para vendas/serviços sem cobertura</small>
+          </label>
+        </div>
+
+        <!-- WhatsApp text -->
+        <div class="section-sep" style="color:var(--wa)">💬 Texto WhatsApp</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:.7rem;color:var(--text-3)">Este texto aparecerá no rodapé da mensagem enviada.</span>
+          <span class="save-default-link" onclick="saveDefaultWA()">💾 Salvar como padrão</span>
+        </div>
+        <textarea class="wa-text-box" id="gf-wa-text" rows="4">TERMOS DE GARANTIA E COBERTURA:
+Garantia Por Lei: de 90 dias + 30 Dias Da Loja.
+
+A GARANTIA NÃO COBRE MAU USO:
+Telas Trincadas, Manchas, Líquido, etc.</textarea>
+
+        <!-- Vigência -->
+        <div class="section-sep">📅 Vigência</div>
+        <div class="fgrid frow">
+          <div><label class="flabel">Início</label><input class="finput" id="gf-start" type="date" /></div>
+          <div><label class="flabel">Meses</label><input class="finput" id="gf-months" type="number" value="3" min="1" max="120" /></div>
+        </div>
+
+        <!-- Fotos entrada -->
+        <div class="section-sep">📷 Fotos da Garantia</div>
+        <button class="photo-qr-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
+          Anexar fotos pelo celular (QR Code)
+        </button>
+        <div class="photo-grid" style="margin-bottom:6px">
+          <div class="photo-drop photo-drop--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            Enviar fotos
+          </div>
+          <div class="photo-drop photo-drop--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            Tirar foto
+          </div>
+        </div>
+        <div class="fcheck-row" style="margin-bottom:6px">
+          <input type="checkbox" id="gf-auth-photos" />
+          <label for="gf-auth-photos">
+            <span>Autorizar visualização pelo cliente</span>
+            <small>Se marcado, as fotos aparecerão no link público de garantia e na autorização digital. Desmarcado, ficam visíveis apenas para você.</small>
+          </label>
+        </div>
+
+        <!-- Fotos saída -->
+        <div class="section-sep" style="color:var(--emerald)">🟢 Fotos de Saída (Entrega)</div>
+        <div class="info-box info-box--cyan">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>O cliente verá estas fotos ao abrir o link público compartilhado (quando "Autorizar visualização pelo cliente" estiver marcado acima).</span>
+        </div>
+        <div class="photo-grid">
+          <div class="photo-drop photo-drop--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            Enviar fotos
+          </div>
+          <div class="photo-drop photo-drop--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            Tirar foto
+          </div>
+        </div>
+
+        <!-- Vídeos -->
+        <div class="section-sep" style="color:var(--red)">🎥 Vídeos da Garantia</div>
+        <p style="font-size:.7rem;color:var(--text-3);margin-bottom:8px">Envie ou grave vídeos curtos (até 30s). Vídeos longos podem ser cortados antes do envio.</p>
+        <div class="photo-grid">
+          <div class="photo-drop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            Enviar vídeo
+          </div>
+          <div class="photo-drop photo-drop--red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>
+            Gravar vídeo
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn--primary btn--sm" id="gar-save-btn" onclick="saveGarantia()">Salvar Registro</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer"><p class="footer__text">&copy; 2026 SkyLab TecGestor — Assistência Técnica</p></footer>
 
   <script type="module">
     import { auth, db, doc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from './page-init.js';
-    let warranties=[];
-    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-    function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('pt-BR')}catch{return d}}
 
-    window.addEventListener('skylab:ready',({detail:{user}})=>{
-      const uid=user.uid, colRef=collection(db,'users',uid,'warranties');
-      // Set default dates
-      const today=new Date().toISOString().split('T')[0];
-      const end90=new Date(Date.now()+90*864e5).toISOString().split('T')[0];
-      document.getElementById('w-start').value=today;
-      document.getElementById('w-end').value=end90;
+    let warranties = [], garParts = [], garSvcs = [], garType = 'svc';
+    let colRef, uid;
 
-      onSnapshot(query(colRef,orderBy('createdAt','desc')),(snap)=>{warranties=snap.docs.map(d=>({id:d.id,...d.data()}));render()});
-
-      document.getElementById('w-form').addEventListener('submit',async(e)=>{
-        e.preventDefault();const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;
-        try{await addDoc(colRef,{client:document.getElementById('w-client').value.trim(),device:document.getElementById('w-device').value.trim(),osNumber:document.getElementById('w-os').value.trim(),type:document.getElementById('w-type').value.trim(),startDate:document.getElementById('w-start').value,endDate:document.getElementById('w-end').value,createdAt:serverTimestamp()});e.target.reset();document.getElementById('w-start').value=today;document.getElementById('w-end').value=end90;}catch(err){alert('Erro: '+err.message)}btn.disabled=false;
+    window.addEventListener('skylab:ready', ({ detail: { user } }) => {
+      uid = user.uid;
+      colRef = collection(db, 'users', uid, 'warranties');
+      // set default date
+      document.getElementById('gf-start').value = new Date().toISOString().split('T')[0];
+      onSnapshot(query(colRef, orderBy('createdAt','desc')), snap => {
+        warranties = snap.docs.map(d=>({id:d.id,...d.data()}));
+        render();
       });
     });
 
-    function getStatus(endDate){
-      if(!endDate)return{label:'Indefinida',cls:'w-active'};
-      const now=Date.now(),end=new Date(endDate).getTime(),days=Math.ceil((end-now)/864e5);
-      if(days<0)return{label:'Vencida',cls:'w-expired'};
-      if(days<=7)return{label:`${days}d restante(s)`,cls:'w-expiring'};
-      return{label:'Ativa',cls:'w-active'};
+    /* ── TYPE ── */
+    window.setGarType = function(t) {
+      garType = t;
+      document.getElementById('tab-svc').classList.toggle('active', t==='svc');
+      document.getElementById('tab-vnd').classList.toggle('active', t==='vnd');
+    };
+
+    /* ── SERVICES ── */
+    window.addGarSvc = function() {
+      const inp = document.getElementById('gf-svc-input');
+      const val = inp.value.trim(); if(!val) return;
+      garSvcs.push(val); renderSvcs(); inp.value='';
+    };
+    function renderSvcs() {
+      document.getElementById('gf-svc-tags').innerHTML = garSvcs.map((s,i)=>`<span class="svc-tag">${esc(s)}<button onclick="removeSvc(${i})">✕</button></span>`).join('');
+    }
+    window.removeSvc = function(i) { garSvcs.splice(i,1); renderSvcs(); };
+
+    /* ── PARTS ── */
+    window.addGarPart = function() {
+      const name = document.getElementById('gf-part-name').value.trim(); if(!name) return;
+      const cost = parseFloat(document.getElementById('gf-part-cost').value)||0;
+      const sale = parseFloat(document.getElementById('gf-part-sale').value)||0;
+      garParts.push({name,cost,sale}); renderParts();
+      document.getElementById('gf-part-name').value='';
+      document.getElementById('gf-part-cost').value='';
+      document.getElementById('gf-part-sale').value='';
+    };
+    function renderParts() {
+      document.getElementById('gf-part-list').innerHTML = garParts.map((p,i)=>`<div class="part-item"><span class="part-item__name">${esc(p.name)}</span><span class="part-item__price">R$ ${(p.sale||p.cost||0).toFixed(2)}</span><button class="part-item__rm" onclick="removeGarPart(${i})">✕</button></div>`).join('');
+    }
+    window.removeGarPart = function(i) { garParts.splice(i,1); renderParts(); };
+
+    /* ── SAVE ── */
+    window.saveGarantia = async function() {
+      const client = document.getElementById('gf-client').value.trim();
+      if(!client) { alert('Informe o nome do cliente.'); return; }
+      const startDate = document.getElementById('gf-start').value;
+      const months = parseInt(document.getElementById('gf-months').value)||3;
+      const endDate = (() => { const d=new Date(startDate||Date.now()); d.setMonth(d.getMonth()+months); return d.toISOString().split('T')[0]; })();
+      const btn = document.getElementById('gar-save-btn');
+      btn.disabled=true; btn.textContent='Salvando...';
+      try {
+        await addDoc(colRef, {
+          type: garType, client,
+          whatsapp: document.getElementById('gf-wa').value.trim(),
+          device: document.getElementById('gf-device').value.trim(),
+          imei: document.getElementById('gf-imei').value.trim(),
+          cpf: document.getElementById('gf-cpf').value.trim(),
+          services: garSvcs,
+          vendor: document.getElementById('gf-vendor').value.trim(),
+          observations: document.getElementById('gf-obs').value.trim(),
+          parts: garParts,
+          hasWarranty: document.getElementById('gf-has-gar').checked,
+          waText: document.getElementById('gf-wa-text').value,
+          startDate, endDate, months,
+          createdAt: serverTimestamp()
+        });
+        closeModal();
+        showToast('Garantia registrada!');
+      } catch(err){ alert('Erro: '+err.message); }
+      btn.disabled=false; btn.textContent='Salvar Registro';
+    };
+
+    /* ── DELETE ── */
+    window.deleteGar = async function(id) {
+      if(!confirm('Excluir esta garantia?')) return;
+      try{ await deleteDoc(doc(db,'users',uid,'warranties',id)); }
+      catch(e){ alert('Erro: '+e.message); }
+    };
+
+    /* ── MODAL ── */
+    window.openGarModal = function() {
+      garSvcs=[]; garParts=[]; garType='svc';
+      renderSvcs(); renderParts();
+      setGarType('svc');
+      ['gf-client','gf-wa','gf-device','gf-imei','gf-cpf','gf-vendor','gf-obs'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      document.getElementById('gf-start').value = new Date().toISOString().split('T')[0];
+      document.getElementById('gf-months').value = '3';
+      document.getElementById('gar-modal').classList.add('open');
+      document.body.style.overflow='hidden';
+    };
+    window.closeModal = function() {
+      document.getElementById('gar-modal').classList.remove('open');
+      document.body.style.overflow='';
+    };
+    document.getElementById('gar-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
+    window.saveDefaultText = function() { localStorage.setItem('skylab_gar_obs_default', document.getElementById('gf-obs').value); showToast('Texto padrão salvo!'); };
+    window.saveDefaultWA   = function() { localStorage.setItem('skylab_gar_wa_default',  document.getElementById('gf-wa-text').value); showToast('Texto WhatsApp padrão salvo!'); };
+
+    /* ── RENDER ── */
+    function getStatus(endDate) {
+      if(!endDate) return{label:'Ativa',cls:'active'};
+      const now=Date.now(), end=new Date(endDate).getTime(), days=Math.ceil((end-now)/864e5);
+      if(days<0) return{label:'Vencida',cls:'expired'};
+      if(days<=7) return{label:`${days}d restante(s)`,cls:'expiring'};
+      return{label:'Ativa',cls:'active'};
+    }
+    function render() {
+      const el = document.getElementById('gar-list');
+      if(!warranties.length) {
+        el.innerHTML=`<div class="gar-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg><p>Nenhuma garantia registrada.</p></div>`;
+        return;
+      }
+      el.innerHTML = warranties.map(w=>{
+        const st = getStatus(w.endDate);
+        const svcs = Array.isArray(w.services) && w.services.length ? w.services.join(', ') : (w.type||'');
+        return `<div class="gar-card">
+          <div class="gar-card__body">
+            <div class="gar-card__top">
+              <span class="gar-badge gar-badge--${st.cls}">${st.label}</span>
+              <button class="gar-card__rm" onclick="deleteGar('${w.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+            </div>
+            <div class="gar-card__client">${esc(w.client)}</div>
+            <div class="gar-card__device">${esc(w.device||'—')}</div>
+            ${svcs?`<div class="gar-card__svc">${esc(svcs)}</div>`:''}
+            ${w.imei?`<div class="gar-card__svc">IMEI: ${esc(w.imei)}</div>`:''}
+            <div class="gar-card__dates">
+              <div><div>Início</div><strong>${fmtDate(w.startDate)}</strong></div>
+              <div><div>Vencimento</div><strong>${fmtDate(w.endDate)}</strong></div>
+              ${w.months?`<div><div>Duração</div><strong>${w.months} meses</strong></div>`:''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
     }
 
-    function render(){
-      const el=document.getElementById('w-list');
-      document.getElementById('w-count').textContent=`(${warranties.length})`;
-      if(!warranties.length){el.innerHTML='<div class="w-empty">Nenhuma garantia registrada.</div>';return;}
-      el.innerHTML=`<table class="w-table"><thead><tr><th>Cliente</th><th>Aparelho</th><th>OS</th><th>Serviço</th><th>Início</th><th>Vencimento</th><th>Status</th><th></th></tr></thead><tbody>${warranties.map(w=>{const st=getStatus(w.endDate);return`<tr><td style="color:var(--text-1);font-weight:600;">${esc(w.client)}</td><td>${esc(w.device)}</td><td style="font-family:var(--f-mono);">#${esc(w.osNumber)}</td><td>${esc(w.type)}</td><td>${fmtDate(w.startDate)}</td><td>${fmtDate(w.endDate)}</td><td><span class="w-badge ${st.cls}">${st.label}</span></td><td><button class="act-btn" onclick="window.__delW('${w.id}')" title="Excluir" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></td></tr>`}).join('')}</tbody></table>`;
-    }
-    window.__delW=async(id)=>{if(!confirm('Excluir garantia?'))return;try{const u=auth.currentUser;if(u)await deleteDoc(doc(db,'users',u.uid,'warranties',id))}catch(e){console.error(e)}};
+    function fmtDate(d) { if(!d) return '—'; try{ return new Date(d).toLocaleDateString('pt-BR'); }catch{return d;} }
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function showToast(msg){let t=document.createElement('div');t.style.cssText='position:fixed;top:72px;right:16px;background:var(--emerald);color:#fff;padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:700;z-index:999;';t.textContent='✓ '+msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},2500);}
   </script>
 </body>
 </html>
