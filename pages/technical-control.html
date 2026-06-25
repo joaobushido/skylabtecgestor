@@ -4,27 +4,232 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkyLab TecGestor — Controle Técnico</title>
-  <meta name="description" content="Gerencie todas as ordens de serviço da sua assistência técnica." />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../style.css" />
   <style>
-    .os-table { width:100%; border-collapse:separate; border-spacing:0; margin-top:24px; }
-    .os-table th { font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--text-3); text-align:left; padding:12px 14px; border-bottom:1px solid var(--border); }
-    .os-table td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.04); font-size:.85rem; color:var(--text-2); }
-    .os-table tr:hover td { background:rgba(255,255,255,.02); }
-    .os-badge { padding:3px 10px; border-radius:999px; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
-    .os-badge--progress { background:rgba(43,98,232,.12); color:var(--blue-bright); }
-    .os-badge--done { background:rgba(16,185,129,.12); color:var(--emerald); }
-    .os-badge--waiting { background:rgba(245,158,11,.12); color:var(--amber); }
-    .os-badge--cancelled { background:rgba(239,68,68,.12); color:var(--red); }
-    .os-actions { display:flex; gap:6px; }
-    .os-actions button { padding:6px; border-radius:6px; color:var(--text-3); transition:color .2s, background .2s; }
-    .os-actions button:hover { color:var(--text-1); background:rgba(255,255,255,.06); }
-    .os-actions button svg { width:16px; height:16px; }
-    .add-form { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:24px; }
-    .add-form--full { grid-column:1/-1; }
-    .os-empty { text-align:center; padding:60px 20px; color:var(--text-3); font-size:.88rem; }
-    @media(max-width:768px) { .add-form { grid-template-columns:1fr; } .os-table { display:block; overflow-x:auto; } }
+    /* ── STAT COUNTERS ── */
+    .tc-counters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+    .tc-counter{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r-s);padding:14px 10px;text-align:center}
+    .tc-counter__label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:6px}
+    .tc-counter__val{font-size:1.6rem;font-weight:900;font-family:var(--f-mono);color:var(--text-1)}
+    .tc-counter--orange .tc-counter__val{color:var(--orange)}
+    .tc-counter--blue   .tc-counter__val{color:var(--blue-bright)}
+    .tc-counter--purple .tc-counter__val{color:var(--purple)}
+    .tc-counter--green  .tc-counter__val{color:var(--emerald)}
+
+    /* ── TOOLBAR ── */
+    .tc-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .tc-search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 14px;flex:1;max-width:360px;min-width:180px}
+    .tc-search input{background:none;border:none;outline:none;color:var(--text-1);font-size:.85rem;font-family:var(--f-body);width:100%}
+    .tc-search input::placeholder{color:var(--text-3)}
+    .tc-search svg{color:var(--text-3);flex-shrink:0;width:15px;height:15px}
+    .btn-nova-os{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--blue-core);border:none;border-radius:10px;color:#fff;font-size:.83rem;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+    .btn-nova-os:hover{background:var(--blue-bright)}
+    .btn-filtros{display:flex;align-items:center;gap:6px;padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;color:var(--text-2);font-size:.83rem;font-weight:600;cursor:pointer;transition:.2s}
+    .btn-filtros:hover{background:rgba(255,255,255,.08);border-color:var(--border-hover)}
+
+    /* ── TABS ── */
+    .tc-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+    .tc-tab{padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-3);font-size:.83rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px;margin-bottom:-1px;font-family:var(--f-body)}
+    .tc-tab.active{color:var(--blue-bright);border-bottom-color:var(--blue-bright)}
+    .tc-tab svg{width:15px;height:15px}
+
+    /* ── DRAFT BANNER ── */
+    .draft-banner{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);border-radius:12px;margin-bottom:14px}
+    .draft-banner .icon{font-size:18px;flex-shrink:0}
+    .draft-info{flex:1;min-width:0}
+    .draft-info strong{display:block;font-size:.82rem;color:var(--orange);font-weight:700}
+    .draft-info span{font-size:.72rem;color:var(--text-3)}
+    .draft-actions{display:flex;gap:6px;flex-shrink:0}
+    .draft-btn{padding:6px 12px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:.2s}
+    .draft-btn--continue{background:var(--orange);color:#fff}
+    .draft-btn--discard{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text-2)}
+    .draft-btn--discard:hover{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
+
+    /* ── OS CARD ── */
+    .os-cards{display:flex;flex-direction:column;gap:10px}
+    .os-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s}
+    .os-card:hover{border-color:var(--border-hover)}
+    .os-card__body{padding:14px 16px}
+    .os-card__top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+    .os-card__num{font-family:var(--f-mono);font-size:1rem;font-weight:700;color:var(--text-1)}
+    .os-card__price{font-family:var(--f-mono);font-size:.95rem;font-weight:700;color:var(--orange)}
+    .os-card__client{font-size:.78rem;color:var(--text-3);margin-top:2px}
+    .os-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+    .os-badge--fila    {background:rgba(249,115,22,.12);color:var(--orange)}
+    .os-badge--bancada {background:rgba(43,98,232,.12);color:var(--blue-bright)}
+    .os-badge--peca    {background:rgba(139,92,246,.12);color:var(--purple)}
+    .os-badge--pronto  {background:rgba(16,185,129,.12);color:var(--emerald)}
+    .os-badge--entregue{background:rgba(255,255,255,.06);color:var(--text-3)}
+    .os-card__section-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:4px}
+    .os-card__device{font-size:.85rem;color:var(--text-1);font-weight:600;line-height:1.3}
+    .os-card__service{font-size:.75rem;color:var(--text-2)}
+    .defect-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);border-radius:999px;font-size:.65rem;font-weight:700;color:var(--orange);margin-top:4px}
+    .os-card__imei{font-family:var(--f-mono);font-size:.72rem;color:var(--text-3);margin-top:8px}
+    .os-card__view-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:rgba(255,255,255,.03);border:none;border-top:1px solid var(--border);color:var(--text-2);font-size:.75rem;font-weight:600;cursor:pointer;transition:.2s;font-family:var(--f-body)}
+    .os-card__view-btn:hover{background:rgba(255,255,255,.06);color:var(--text-1)}
+    .os-card__actions{display:flex;border-top:1px solid var(--border)}
+    .os-action{flex:1;padding:10px 6px;border:none;background:none;color:var(--text-3);font-size:.62rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:3px;border-right:1px solid var(--border);font-family:var(--f-body)}
+    .os-action:last-child{border-right:none}
+    .os-action:hover{background:rgba(255,255,255,.04);color:var(--text-2)}
+    .os-action--wa:hover{background:rgba(37,211,102,.08);color:var(--wa)}
+    .os-action--del:hover{background:rgba(239,68,68,.08);color:var(--red)}
+    .os-action svg{width:17px;height:17px}
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--void-card);border:1px solid var(--border-hover);border-radius:18px;width:100%;max-width:500px;margin:auto;box-shadow:0 24px 80px rgba(0,0,0,.7);transform:translateY(20px);transition:transform .2s}
+    .modal-overlay.open .modal{transform:translateY(0)}
+    .modal--wide{max-width:860px}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--void-card);z-index:10;border-radius:18px 18px 0 0}
+    .modal-header h2{font-size:.95rem;font-weight:700;color:var(--text-1)}
+    .modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;font-size:16px}
+    .modal-close:hover{background:rgba(255,255,255,.1);color:var(--text-1)}
+    .modal-body{padding:18px 20px;max-height:72vh;overflow-y:auto}
+    .modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--void-card);border-radius:0 0 18px 18px}
+
+    /* ── FORM ELEMENTS ── */
+    .frow{margin-bottom:14px}
+    .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .flabel{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:5px;display:block}
+    .finput{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text-1);font-size:.85rem;font-family:var(--f-body);outline:none;transition:.2s}
+    .finput:focus{border-color:var(--blue-bright);background:rgba(43,98,232,.06)}
+    .finput::placeholder{color:var(--text-3)}
+    select.finput{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6c8c' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+    textarea.finput{resize:vertical;min-height:72px}
+
+    /* custom dropdown */
+    .fdropdown{position:relative}
+    .fdropdown-btn{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text-2);font-size:.85rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:.2s;font-family:var(--f-body)}
+    .fdropdown-btn:hover{border-color:var(--border-hover)}
+    .fdropdown-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--void-card);border:1px solid var(--border-hover);border-radius:12px;z-index:100;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none;max-height:220px;overflow-y:auto}
+    .fdropdown-panel.open{display:block}
+    .fdropdown-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;font-size:.83rem;color:var(--text-2);transition:.15s}
+    .fdropdown-opt:hover{background:rgba(255,255,255,.04);color:var(--text-1)}
+    .fdropdown-opt input[type=checkbox]{accent-color:var(--blue-bright);width:14px;height:14px}
+    .fdropdown-add{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--border)}
+    .fdropdown-add input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text-1);font-size:.78rem;font-family:var(--f-body);outline:none}
+    .fdropdown-add button{background:var(--blue-core);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:.75rem;font-weight:700;cursor:pointer}
+
+    /* check row */
+    .fcheck-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+    .fcheck-row:hover{border-color:var(--border-hover)}
+    .fcheck-row input[type=checkbox]{accent-color:var(--blue-bright);width:15px;height:15px;flex-shrink:0;margin-top:1px}
+    .fcheck-row label{font-size:.83rem;color:var(--text-1);font-weight:500;cursor:pointer;flex:1}
+    .fcheck-row small{font-size:.7rem;color:var(--text-3);display:block;margin-top:2px}
+    .fcheck-row.active{background:rgba(43,98,232,.08);border-color:rgba(43,98,232,.35)}
+
+    /* section label */
+    .section-sep{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+    .section-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* photo upload */
+    .photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px 12px;text-align:center;color:var(--text-3);font-size:.75rem;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:5px}
+    .photo-drop:hover{border-color:var(--blue-bright);color:var(--blue-bright);background:rgba(43,98,232,.05)}
+    .photo-drop--green{border-color:rgba(16,185,129,.3)}
+    .photo-drop--green:hover{border-color:var(--emerald);color:var(--emerald);background:rgba(16,185,129,.05)}
+    .photo-drop--red{border-color:rgba(239,68,68,.3)}
+    .photo-drop svg{width:22px;height:22px}
+    .photo-qr-btn{width:100%;background:var(--blue-core);color:#fff;border:none;border-radius:10px;padding:11px 14px;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.2s;margin-bottom:6px;font-family:var(--f-body)}
+    .photo-qr-btn:hover{background:var(--blue-bright)}
+
+    /* checklist */
+    .checklist-wrap{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .checklist-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+    .checklist-item:last-child{border-bottom:none}
+    .checklist-item input[type=radio]{accent-color:var(--blue-bright);width:15px;height:15px;flex-shrink:0}
+    .checklist-item__name{flex:1;font-size:.82rem;color:var(--text-1)}
+    .checklist-item__status{font-size:.62rem;font-weight:700;color:var(--text-3);background:rgba(255,255,255,.05);padding:2px 9px;border-radius:999px;white-space:nowrap}
+    .checklist-item input[type=radio]:checked ~ .checklist-item__status{background:rgba(16,185,129,.12);color:var(--emerald)}
+    .checklist-item__rm{width:20px;height:20px;border:none;background:transparent;color:var(--text-3);cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:.15s}
+    .checklist-item__rm:hover{color:var(--red)}
+    .checklist-add{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--border)}
+    .checklist-add input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text-1);font-size:.78rem;font-family:var(--f-body);outline:none}
+    .checklist-add button{background:var(--blue-core);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:.75rem;font-weight:700;cursor:pointer}
+
+    /* password */
+    .pwd-row{display:flex;gap:8px}
+    .pwd-value-wrap{position:relative;flex:1}
+    .pwd-value-wrap .finput{padding-right:38px}
+    .pwd-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-3);cursor:pointer;padding:4px}
+    .pwd-toggle:hover{color:var(--text-1)}
+    .pattern-area{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px}
+    .pattern-hint{font-size:.7rem;color:var(--blue-bright);margin-bottom:10px;text-align:center}
+    .pattern-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:180px;margin:0 auto}
+    .pattern-dot{width:38px;height:38px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;font-size:.65rem;color:var(--text-3);position:relative}
+    .pattern-dot.sel{border-color:var(--blue-bright);background:rgba(43,98,232,.15)}
+    .pattern-dot.sel::after{content:'';width:10px;height:10px;background:var(--blue-bright);border-radius:50%;position:absolute}
+    .pattern-clear{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:.72rem;color:var(--text-2);cursor:pointer;float:right;margin-bottom:8px;font-family:var(--f-body)}
+    .pattern-seq{font-size:.68rem;color:var(--text-3);text-align:center;margin-top:8px}
+
+    /* parts */
+    .parts-from-stock{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text-2);font-size:.83rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:.2s;margin-bottom:8px;font-family:var(--f-body)}
+    .parts-from-stock:hover{border-color:var(--border-hover)}
+    .parts-avulso{display:flex;gap:6px;align-items:center}
+    .parts-avulso .finput{min-width:0}
+    .parts-avulso .finput--sm{width:90px}
+    .btn-add-part{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;font-family:var(--f-body)}
+    .btn-add-part:hover{opacity:.9}
+    .part-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+    .part-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:8px 12px}
+    .part-item__name{flex:1;font-size:.82rem;color:var(--text-1)}
+    .part-item__price{font-family:var(--f-mono);font-size:.78rem;color:var(--blue-bright)}
+    .part-item__rm{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1;padding:0 2px}
+    .part-item__rm:hover{color:var(--red)}
+    .total-row{display:flex;align-items:center;gap:10px}
+    .total-field{flex:1;position:relative}
+    .total-field__prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.82rem;color:var(--text-3);font-family:var(--f-mono)}
+    .total-field .finput{padding-left:36px}
+
+    /* info box */
+    .info-box{display:flex;gap:8px;padding:9px 12px;border-radius:9px;font-size:.75rem;margin-bottom:8px}
+    .info-box--cyan{background:rgba(6,182,212,.08);color:var(--cyan);border:1px solid rgba(6,182,212,.2)}
+    .info-box--green{background:rgba(16,185,129,.08);color:var(--emerald);border:1px solid rgba(16,185,129,.2)}
+
+    /* WA modal */
+    .wa-modal{max-width:360px;background:#fff;color:#111}
+    .wa-header{background:#25D366;border-radius:18px 18px 0 0;padding:14px 16px;color:#fff;display:flex;align-items:center;gap:10px}
+    .wa-header svg{width:26px;height:26px;flex-shrink:0}
+    .wa-header strong{display:block;font-size:.9rem;font-weight:700}
+    .wa-header span{font-size:.72rem;opacity:.85}
+    .wa-body{padding:14px 16px}
+    .wa-msg{background:#f0f0f0;border-radius:10px;padding:12px;font-size:.78rem;white-space:pre-wrap;line-height:1.6;max-height:180px;overflow-y:auto;font-family:sans-serif}
+    .wa-actions{padding:0 16px 16px;display:flex;flex-direction:column;gap:7px}
+    .wa-btn{width:100%;border:none;border-radius:10px;padding:12px;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
+    .wa-btn--green{background:#25D366;color:#fff}
+    .wa-btn--green:hover{background:#1da352}
+    .wa-btn--blue{background:#0066cc;color:#fff}
+    .wa-btn--blue:hover{background:#0055aa}
+    .wa-cancel{display:block;text-align:center;font-size:.78rem;color:#666;cursor:pointer;padding:6px;margin-top:4px}
+
+    /* VIEW modal */
+    .view-sec{margin-bottom:14px}
+    .view-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:4px}
+    .view-val{font-size:.88rem;color:var(--text-1)}
+    .view-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    /* status select */
+    .status-inline{display:flex;gap:8px;flex-wrap:wrap}
+    .status-chip{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;font-family:var(--f-body)}
+    .status-chip.active{border-color:transparent}
+    .status-chip--fila.active{background:rgba(249,115,22,.15);color:var(--orange);border-color:rgba(249,115,22,.3)}
+    .status-chip--bancada.active{background:rgba(43,98,232,.15);color:var(--blue-bright);border-color:rgba(43,98,232,.3)}
+    .status-chip--peca.active{background:rgba(139,92,246,.15);color:var(--purple);border-color:rgba(139,92,246,.3)}
+    .status-chip--pronto.active{background:rgba(16,185,129,.15);color:var(--emerald);border-color:rgba(16,185,129,.3)}
+    .status-chip--entregue.active{background:rgba(255,255,255,.07);color:var(--text-2);border-color:var(--border-hover)}
+
+    /* save auto banner */
+    .autosave-toast{position:fixed;top:72px;right:16px;background:var(--emerald);color:#fff;padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:700;z-index:999;opacity:0;transition:.3s;pointer-events:none;display:flex;align-items:center;gap:6px}
+    .autosave-toast.show{opacity:1}
+
+    /* empty */
+    .tc-empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+    .tc-empty svg{width:48px;height:48px;margin:0 auto 12px;display:block;opacity:.3}
+    .tc-empty p{font-size:.88rem}
+
+    @media(max-width:640px){.tc-counters{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}.modal-body{padding:14px 14px}.parts-avulso{flex-wrap:wrap}.parts-avulso .finput--sm{width:80px}}
   </style>
 </head>
 <body>
@@ -62,42 +267,330 @@
   </nav>
 
   <div class="page-content">
-    <div class="container" style="max-width:1100px;">
-      <div class="page-header reveal">
-        <h1 class="page-header__title">Controle Técnico</h1>
-        <p class="page-header__desc">Gerencie todas as ordens de serviço da sua assistência.</p>
+    <div class="container" style="max-width:1040px;">
+
+      <!-- Header -->
+      <div class="page-header reveal" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-top:8px">
+        <a href="../home.html" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.2s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+        <div>
+          <h1 class="page-header__title" style="margin:0">Controle Técnico</h1>
+        </div>
       </div>
 
-      <!-- Add New OS -->
-      <div class="card reveal" style="--index:1;cursor:default;margin-top:24px;">
-        <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px;">Nova Ordem de Serviço</h3>
-        <form id="os-form" class="add-form">
-          <div class="input-group"><label for="os-client">Cliente</label><input type="text" id="os-client" class="input" placeholder="Nome do cliente" required /></div>
-          <div class="input-group"><label for="os-phone">Telefone</label><input type="tel" id="os-phone" class="input" placeholder="(00) 00000-0000" /></div>
-          <div class="input-group"><label for="os-model">Aparelho / Modelo</label><input type="text" id="os-model" class="input" placeholder="iPhone 14 Pro" required /></div>
-          <div class="input-group"><label for="os-imei">IMEI</label><input type="text" id="os-imei" class="input" placeholder="Opcional" /></div>
-          <div class="input-group"><label for="os-service">Tipo de Serviço</label><input type="text" id="os-service" class="input" placeholder="Troca de tela" required /></div>
-          <div class="input-group"><label for="os-price">Valor (R$)</label><input type="number" id="os-price" class="input" placeholder="350.00" step="0.01" min="0" /></div>
-          <div class="input-group add-form--full"><label for="os-obs">Observações</label><input type="text" id="os-obs" class="input" placeholder="Detalhes adicionais..." /></div>
-          <div class="add-form--full" style="display:flex;gap:10px;justify-content:flex-end;">
-            <button type="submit" class="btn btn--primary btn--sm">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-              Criar OS
-            </button>
-          </div>
-        </form>
+      <!-- Counters -->
+      <div class="tc-counters reveal" style="--index:1">
+        <div class="tc-counter"><div class="tc-counter__label">Na Fila</div><div class="tc-counter__val tc-counter--orange" id="cnt-fila">0</div></div>
+        <div class="tc-counter"><div class="tc-counter__label">Bancada</div><div class="tc-counter__val tc-counter--blue" id="cnt-bancada">0</div></div>
+        <div class="tc-counter"><div class="tc-counter__label">Peça</div><div class="tc-counter__val tc-counter--purple" id="cnt-peca">0</div></div>
+        <div class="tc-counter"><div class="tc-counter__label">Pronto</div><div class="tc-counter__val tc-counter--green" id="cnt-pronto">0</div></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="tc-toolbar reveal" style="--index:2">
+        <div class="tc-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" id="tc-search" placeholder="Buscar OS, Cliente, IMEI..." autocomplete="off" />
+        </div>
+        <button class="btn-nova-os" id="btn-nova-os">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          Nova O.S.
+        </button>
+        <button class="btn-filtros" id="btn-filtros">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filtros
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tc-tabs reveal" style="--index:3">
+        <button class="tc-tab active" id="tab-os" onclick="switchTab('os')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg>
+          O.S.
+        </button>
+        <button class="tc-tab" id="tab-gar" onclick="switchTab('gar')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+          Garantias
+        </button>
+      </div>
+
+      <!-- Draft Banner -->
+      <div class="draft-banner reveal" id="draft-banner" style="--index:4;display:none">
+        <span class="icon">💾</span>
+        <div class="draft-info">
+          <strong>Rascunho de O.S. não salva</strong>
+          <span id="draft-sub">O.S. em preenchimento</span>
+        </div>
+        <div class="draft-actions">
+          <button class="draft-btn draft-btn--continue" onclick="continueDraft()">Continuar</button>
+          <button class="draft-btn draft-btn--discard" onclick="discardDraft()">Descartar</button>
+        </div>
       </div>
 
       <!-- OS List -->
-      <div class="card reveal" style="--index:2;cursor:default;margin-top:16px;padding:0;overflow:hidden;">
-        <div style="padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;">
-          <h3 style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);">Ordens de Serviço <span id="os-count" style="opacity:.5;margin-left:4px;"></span></h3>
-        </div>
-        <div id="os-list" style="overflow-x:auto;">
-          <div class="os-empty">Carregando...</div>
+      <div id="os-list-wrap" class="reveal" style="--index:5">
+        <div class="os-cards" id="os-cards-container">
+          <div class="tc-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 9h6M9 12h4"/></svg>
+            <p>Carregando ordens de serviço...</p>
+          </div>
         </div>
       </div>
+
     </div>
+  </div>
+
+  <!-- ═══════ MODAL: Nova / Editar O.S. ═══════ -->
+  <div class="modal-overlay" id="os-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Ordem de Serviço</h2>
+        <button class="modal-close" onclick="closeOSModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Dados básicos -->
+        <div class="fgrid frow">
+          <div>
+            <label class="flabel">Nome do Cliente *</label>
+            <input class="finput" id="f-client" placeholder="Nome do Cliente" />
+          </div>
+          <div>
+            <label class="flabel">WhatsApp (somente números)</label>
+            <input class="finput" id="f-wa" placeholder="5500000000000" type="tel" />
+          </div>
+        </div>
+        <div class="fgrid frow">
+          <div>
+            <label class="flabel">Modelo do Aparelho *</label>
+            <input class="finput" id="f-device" placeholder="Modelo do Aparelho" />
+          </div>
+          <div>
+            <label class="flabel">IMEI / Serial</label>
+            <input class="finput" id="f-imei" placeholder="IMEI / Serial" />
+          </div>
+        </div>
+        <div class="fgrid frow">
+          <div>
+            <label class="flabel">Tipo de Serviço (pode escolher mais de um)</label>
+            <div class="fdropdown" id="svc-dropdown">
+              <div class="fdropdown-btn" onclick="toggleDropdown('svc-dropdown')">
+                <span id="svc-dropdown-label">Selecione...</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div class="fdropdown-panel" id="svc-dropdown-panel">
+                <label class="fdropdown-opt"><input type="checkbox" value="Troca de Tela" onchange="updateSvcLabel()"> Troca de Tela</label>
+                <label class="fdropdown-opt"><input type="checkbox" value="Software" onchange="updateSvcLabel()"> Software</label>
+                <label class="fdropdown-opt"><input type="checkbox" value="Limpeza/Manutenção" onchange="updateSvcLabel()"> Limpeza/Manutenção</label>
+                <label class="fdropdown-opt"><input type="checkbox" value="Venda de Aparelho" onchange="updateSvcLabel()"> Venda de Aparelho</label>
+                <label class="fdropdown-opt"><input type="checkbox" value="Venda de Acessório" onchange="updateSvcLabel()"> Venda de Acessório</label>
+                <label class="fdropdown-opt"><input type="checkbox" value="Outros" onchange="updateSvcLabel()"> Outros</label>
+                <div class="fdropdown-add">
+                  <input id="svc-custom-input" placeholder="Outro serviço..." />
+                  <button onclick="addCustomSvc()">Ad</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="flabel">Categoria Garantia</label>
+            <select class="finput" id="f-gar-cat">
+              <option value="Serviço">Serviço</option>
+              <option value="Peça">Peça</option>
+              <option value="Nenhuma">Nenhuma</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Garantia checkbox -->
+        <div class="frow">
+          <label class="fcheck-row active" id="gar-check-row">
+            <input type="checkbox" id="f-has-gar" checked onchange="this.closest('label').classList.toggle('active',this.checked)" />
+            <span>
+              <strong>Esta O.S. possui garantia</strong>
+              <small>Desmarque para produtos/serviços sem cobertura</small>
+            </span>
+          </label>
+        </div>
+
+        <!-- Fotos entrada -->
+        <div class="section-sep">📷 Fotos do Estado (Entrada)</div>
+        <button class="photo-qr-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+          Anexar foto/video pelo celular (QR Code)
+        </button>
+        <p style="font-size:.68rem;color:var(--text-3);text-align:center;margin-bottom:8px">Escaneie o QR com o celular e adicione mídia direto da câmera — ela aparece aqui em segundos.</p>
+        <div class="photo-grid">
+          <div class="photo-drop" onclick="triggerFileInput('f-entry-gallery')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            Galeria
+          </div>
+          <div class="photo-drop photo-drop--green" onclick="alert('Use o celular para tirar foto')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            Tirar foto
+          </div>
+        </div>
+        <input type="file" id="f-entry-gallery" accept="image/*" multiple style="display:none" />
+        <p style="font-size:.68rem;color:var(--text-3);margin:6px 0 12px">Nenhuma foto adicionada</p>
+
+        <!-- Autorizar cliente ver fotos -->
+        <label class="fcheck-row" style="margin-bottom:10px">
+          <input type="checkbox" id="f-auth-photos" />
+          <span>
+            <strong>Autorizar cliente a ver as fotos</strong>
+            <small>Se marcado, as fotos aparecerão no link público (garantia e autorização). Desmarcado, ficam visíveis apenas para você.</small>
+          </span>
+        </label>
+
+        <!-- Fotos saída -->
+        <div class="section-sep" style="color:var(--emerald)">🟢 Fotos do Estado (Saída · Entrega)</div>
+        <div class="photo-grid" style="margin-bottom:6px">
+          <div class="photo-drop photo-drop--green" onclick="triggerFileInput('f-exit-gallery')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            Galeria
+          </div>
+          <div class="photo-drop photo-drop--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            Tirar foto
+          </div>
+        </div>
+        <input type="file" id="f-exit-gallery" accept="image/*" multiple style="display:none" />
+        <p style="font-size:.68rem;color:var(--text-3);margin-bottom:4px">Nenhuma foto de saída adicionada</p>
+        <div class="info-box info-box--cyan" style="margin-top:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>O cliente verá estas fotos ao abrir o link público compartilhado (quando "Autorizar cliente a ver as fotos" estiver marcado acima).</span>
+        </div>
+
+        <!-- Checklist -->
+        <div class="section-sep">✅ Checklist de Condição</div>
+        <div class="checklist-wrap" id="checklist-wrap">
+          <!-- items inseridos pelo JS -->
+        </div>
+        <div class="checklist-add" style="border:1px solid var(--border);border-radius:0 0 12px 12px;border-top:none;margin-top:-1px">
+          <input id="checklist-custom" placeholder="Adicionar item personalizado..." />
+          <button onclick="addChecklistItem()">+</button>
+        </div>
+
+        <!-- Observações -->
+        <div class="section-sep">📝 Descrição do Defeito / Observações</div>
+        <div class="frow">
+          <textarea class="finput" id="f-obs" placeholder="Descreva o problema detalhadamente..." rows="3"></textarea>
+        </div>
+
+        <!-- Senha -->
+        <div class="section-sep">🔐 Senha do Aparelho</div>
+        <p style="font-size:.7rem;color:var(--text-3);margin-bottom:8px">Necessária para testes pós-reparo. Mantida confidencial.</p>
+        <div class="pwd-row frow">
+          <select class="finput" id="f-pwd-type" style="flex:0 0 155px" onchange="onPwdTypeChange()">
+            <option value="pin">PIN (numérico)</option>
+            <option value="password">Senha (texto)</option>
+            <option value="pattern">Padrão (arrastar)</option>
+            <option value="none">Sem senha</option>
+          </select>
+          <div class="pwd-value-wrap" id="pwd-value-wrap">
+            <input class="finput" id="f-pwd-value" placeholder="Ex: 1234 ou 123456" type="password" />
+            <button class="pwd-toggle" onclick="togglePwdVisible()" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="pattern-wrap" style="display:none">
+          <div class="pattern-area">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <p class="pattern-hint" style="margin:0;font-size:.68rem">Sequência: <span id="pattern-seq-label">—</span></p>
+              <button class="pattern-clear" onclick="clearPattern()">Limpar</button>
+            </div>
+            <div class="pattern-grid" id="pattern-grid">
+              <!-- 9 dots inserted by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Peças & Custos -->
+        <div class="section-sep">🔧 Peças & Custos</div>
+        <div id="parts-from-stock-btn" style="position:relative;margin-bottom:8px">
+          <div class="fdropdown" id="parts-stock-dropdown">
+            <div class="fdropdown-btn" onclick="toggleDropdown('parts-stock-dropdown')">
+              <span>+ Adicionar Peça do Estoque</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="fdropdown-panel" id="parts-stock-dropdown-panel">
+              <div class="fdropdown-opt" style="color:var(--text-3);font-size:.75rem;cursor:default">Nenhuma peça no estoque</div>
+            </div>
+          </div>
+        </div>
+        <div class="parts-avulso frow">
+          <input class="finput" id="f-part-name" placeholder="Nome da peça/serviço avulso" style="flex:1;min-width:100px" />
+          <input class="finput finput--sm" id="f-part-cost" placeholder="Custo R$" type="number" step="0.01" min="0" />
+          <input class="finput finput--sm" id="f-part-sale" placeholder="Venda R$" type="number" step="0.01" min="0" />
+          <button class="btn-add-part" onclick="addPart()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            Add
+          </button>
+        </div>
+        <div class="part-list" id="part-list"></div>
+
+        <!-- Total & Status -->
+        <div class="fgrid frow">
+          <div>
+            <label class="flabel">Valor Total</label>
+            <div class="total-field">
+              <span class="total-field__prefix">R$</span>
+              <input class="finput" id="f-total" type="number" step="0.01" min="0" value="0" style="padding-left:36px" />
+            </div>
+          </div>
+          <div>
+            <label class="flabel">Status Atual</label>
+            <select class="finput" id="f-status">
+              <option value="fila">Na Fila</option>
+              <option value="bancada">Em Bancada</option>
+              <option value="peca">Aguardando Peça</option>
+              <option value="pronto">Pronto</option>
+              <option value="entregue">Entregue</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--ghost btn--sm" onclick="closeOSModal()">Cancelar</button>
+        <button class="btn btn--primary btn--sm" id="os-save-btn" onclick="saveOS()">Salvar O.S.</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ MODAL: WhatsApp ═══════ -->
+  <div class="modal-overlay" id="wa-modal">
+    <div class="modal wa-modal" style="border:none">
+      <div class="wa-header">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.11.546 4.094 1.502 5.822L0 24l6.335-1.458A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.934 0-3.753-.52-5.322-1.427l-.382-.225-3.76.986.988-3.674-.248-.394A9.934 9.934 0 0 1 2 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+        <div>
+          <strong>Enviar pelo WhatsApp</strong>
+          <span id="wa-to-label">Para: —</span>
+        </div>
+      </div>
+      <div class="wa-body">
+        <div class="wa-msg" id="wa-msg-text"></div>
+      </div>
+      <div class="wa-actions">
+        <button class="wa-btn wa-btn--green" id="wa-open-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.11.546 4.094 1.502 5.822L0 24l6.335-1.458A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.934 0-3.753-.52-5.322-1.427l-.382-.225-3.76.986.988-3.674-.248-.394A9.934 9.934 0 0 1 2 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+          Abrir WhatsApp
+        </button>
+        <button class="wa-btn wa-btn--blue" id="wa-copy-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copiar mensagem
+        </button>
+        <span class="wa-cancel" onclick="closeModal('wa-modal')">Cancelar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- autosave toast -->
+  <div class="autosave-toast" id="autosave-toast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+    Rascunho salvo automaticamente
   </div>
 
   <footer class="footer">
@@ -105,124 +598,506 @@
   </footer>
 
   <script type="module">
-    import { auth, db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, getDocs } from './page-init.js';
+    import { auth, db, doc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, getDocs } from './page-init.js';
 
-    let services = [];
+    /* ── STATE ── */
+    let orders = [];
+    let editingId = null;
+    let currentTab = 'os';
+    let searchText = '';
+    let inventoryItems = [];
+    let parts = [];
+    let patternSeq = [];
     let osCounter = 0;
+    let colRef, uid;
+    let autosaveTimer;
 
+    const CHECKLIST_DEFAULTS = [
+      'Tela sem trincos','Touch funcionando','Câmera frontal OK','Câmera traseira OK',
+      'Alto-falante / Auricular OK','Microfone OK','Botões físicos (Power/Volume) OK',
+      'Conector de carga OK','Biometria (Digital/Face ID) OK','Wi-Fi / Rede móvel OK',
+      'Bateria saudável','Carcaça sem amassados','Acompanha capa/película','Acompanha cabo/carregador'
+    ];
+
+    /* ── INIT ── */
     window.addEventListener('skylab:ready', async ({ detail: { user } }) => {
-      const uid = user.uid;
-      const colRef = collection(db, 'users', uid, 'services');
+      uid = user.uid;
+      colRef = collection(db, 'users', uid, 'services');
+      const invRef = collection(db, 'users', uid, 'inventory');
 
-      // Real-time listener
-      onSnapshot(query(colRef, orderBy('createdAt', 'desc')), (snap) => {
-        services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderList();
-      }, (err) => {
-        console.error('Services listener error:', err);
-        document.getElementById('os-list').innerHTML = '<div class="os-empty">Erro ao carregar dados.</div>';
+      // OS counter
+      try {
+        const snap = await import('../firebase-config.js');
+        const counterDoc = await snap.getDoc(doc(db,'users',uid,'settings','counters'));
+        osCounter = counterDoc.exists() ? (counterDoc.data().osCounter || 6000) : 6000;
+      } catch(e){ osCounter = 6000; }
+
+      // Load inventory for parts dropdown
+      onSnapshot(query(invRef, orderBy('createdAt','desc')), snap => {
+        inventoryItems = snap.docs.map(d => ({id:d.id,...d.data()}));
+        renderInventoryDropdown();
       });
 
-      // Get OS counter
-      try {
-        const counterDoc = await getDoc(doc(db, 'users', uid, 'settings', 'counters'));
-        osCounter = counterDoc.exists() ? (counterDoc.data().osCounter || 0) : 0;
-      } catch(e) { osCounter = 0; }
+      // Load orders realtime
+      onSnapshot(query(colRef, orderBy('createdAt','desc')), snap => {
+        orders = snap.docs.map(d => ({id:d.id,...d.data()}));
+        renderOrders();
+        updateCounters();
+      }, err => {
+        document.getElementById('os-cards-container').innerHTML = '<div class="tc-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><p>Erro ao carregar dados. Verifique sua conexão.</p></div>';
+      });
 
-      // Form submit
-      document.getElementById('os-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
+      // Draft
+      checkDraft();
 
-        osCounter++;
-        const osNum = String(osCounter).padStart(3, '0');
-
-        try {
-          await addDoc(colRef, {
-            osNumber: osNum,
-            client: document.getElementById('os-client').value.trim(),
-            phone: document.getElementById('os-phone').value.trim(),
-            model: document.getElementById('os-model').value.trim(),
-            imei: document.getElementById('os-imei').value.trim(),
-            serviceType: document.getElementById('os-service').value.trim(),
-            price: parseFloat(document.getElementById('os-price').value) || 0,
-            observations: document.getElementById('os-obs').value.trim(),
-            status: 'Em andamento',
-            createdAt: serverTimestamp()
-          });
-          await setDoc(doc(db, 'users', uid, 'settings', 'counters'), { osCounter }, { merge: true });
-          e.target.reset();
-        } catch (err) {
-          console.error('Create OS error:', err);
-          alert('Erro ao criar OS. Tente novamente.');
-          osCounter--;
-        }
-        btn.disabled = false;
+      // Search
+      document.getElementById('tc-search').addEventListener('input', e => {
+        searchText = e.target.value.toLowerCase();
+        renderOrders();
       });
     });
 
-    function statusBadge(status) {
-      const s = (status || '').toLowerCase();
-      if (s.includes('conclu')) return `<span class="os-badge os-badge--done">${status}</span>`;
-      if (s.includes('aguard')) return `<span class="os-badge os-badge--waiting">${status}</span>`;
-      if (s.includes('cancel')) return `<span class="os-badge os-badge--cancelled">${status}</span>`;
-      return `<span class="os-badge os-badge--progress">${status || 'Em andamento'}</span>`;
+    /* ── COUNTERS ── */
+    function updateCounters() {
+      const active = orders.filter(o => o.status !== 'entregue');
+      document.getElementById('cnt-fila').textContent    = active.filter(o=>o.status==='fila').length;
+      document.getElementById('cnt-bancada').textContent = active.filter(o=>o.status==='bancada').length;
+      document.getElementById('cnt-peca').textContent    = active.filter(o=>o.status==='peca').length;
+      document.getElementById('cnt-pronto').textContent  = active.filter(o=>o.status==='pronto').length;
     }
 
-    function esc(s) { return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-    function renderList() {
-      const el = document.getElementById('os-list');
-      const countEl = document.getElementById('os-count');
-      if (countEl) countEl.textContent = `(${services.length})`;
-
-      if (!services.length) {
-        el.innerHTML = '<div class="os-empty">Nenhuma OS cadastrada. Crie a primeira acima.</div>';
+    /* ── RENDER ORDERS ── */
+    function renderOrders() {
+      let list = orders;
+      if(searchText) {
+        list = orders.filter(o =>
+          (o.client||'').toLowerCase().includes(searchText) ||
+          (o.device||'').toLowerCase().includes(searchText) ||
+          String(o.osNumber||'').includes(searchText) ||
+          (o.imei||'').toLowerCase().includes(searchText)
+        );
+      }
+      const el = document.getElementById('os-cards-container');
+      if(!list.length) {
+        el.innerHTML = `<div class="tc-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 9h6M9 12h4"/></svg>
+          <p>${searchText ? 'Nenhuma OS encontrada.' : 'Nenhuma OS cadastrada. Clique em + Nova O.S. para começar.'}</p>
+        </div>`;
         return;
       }
-
-      el.innerHTML = `<table class="os-table">
-        <thead><tr><th>OS</th><th>Cliente</th><th>Aparelho</th><th>Serviço</th><th>Valor</th><th>Status</th><th></th></tr></thead>
-        <tbody>${services.map(s => `<tr>
-          <td style="font-family:var(--f-mono);color:var(--blue-bright);font-weight:700;">#${esc(s.osNumber)}</td>
-          <td style="color:var(--text-1);font-weight:600;">${esc(s.client)}</td>
-          <td>${esc(s.model)}${s.imei ? '<br><span class="mono" style="font-size:.7rem;color:var(--text-3);">' + esc(s.imei) + '</span>' : ''}</td>
-          <td>${esc(s.serviceType)}</td>
-          <td style="font-family:var(--f-mono);">R$ ${(s.price||0).toFixed(2)}</td>
-          <td>${statusBadge(s.status)}</td>
-          <td class="os-actions">
-            <button onclick="window.__cycleStatus('${s.id}')" title="Próximo status">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-            </button>
-            <button onclick="window.__deleteOS('${s.id}')" title="Excluir" style="color:var(--red);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-            </button>
-          </td>
-        </tr>`).join('')}</tbody>
-      </table>`;
+      el.innerHTML = list.map(o => renderCard(o)).join('');
     }
 
-    const STATUSES = ['Em andamento', 'Aguardando peça', 'Concluído', 'Cancelado'];
+    function renderCard(o) {
+      const svcs = Array.isArray(o.services) ? o.services : [o.serviceType||'Serviço'];
+      const statusCls = { fila:'fila', bancada:'bancada', peca:'peca', pronto:'pronto', entregue:'entregue' }[o.status]||'fila';
+      const statusLabel = { fila:'Na Fila', bancada:'Em Bancada', peca:'Aguardando Peça', pronto:'Pronto', entregue:'Entregue' }[o.status]||'Na Fila';
+      const price = Number(o.total||o.price||0);
+      const defects = Array.isArray(o.defects) ? o.defects.length : 0;
+      return `<div class="os-card" id="card-${o.id}">
+        <div class="os-card__body">
+          <span class="os-badge os-badge--${statusCls}">${statusLabel}</span>
+          <div class="os-card__top">
+            <div>
+              <div class="os-card__num">#${o.osNumber||'—'}</div>
+              <div class="os-card__client">${esc(o.client)}</div>
+            </div>
+            <div class="os-card__price">${price>0?'R$ '+price.toFixed(2).replace('.',','):''}</div>
+          </div>
+          <div class="os-card__section-label">APARELHO</div>
+          <div class="os-card__device">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><rect width="12" height="20" x="6" y="2" rx="2"/><path d="M12 18h.01"/></svg>
+            ${esc(o.device||'—')}
+          </div>
+          <div class="os-card__service">${svcs.map(s=>esc(s)).join(', ')}</div>
+          ${defects>0?`<div class="defect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg> ${defects} defeito(s) na entrada</div>`:''}
+          ${o.imei?`<div class="os-card__imei">IMEI / SERIAL<br>${esc(o.imei)}</div>`:''}
+        </div>
+        <button class="os-card__view-btn" onclick="viewOS('${o.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          Ver ordem
+        </button>
+        <div class="os-card__actions">
+          <button class="os-action" onclick="printOS('${o.id}')" title="Imprimir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+            <span>Imprimir</span>
+          </button>
+          <button class="os-action os-action--wa" onclick="openWA('${o.id}')" title="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.11.546 4.094 1.502 5.822L0 24l6.335-1.458A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.934 0-3.753-.52-5.322-1.427l-.382-.225-3.76.986.988-3.674-.248-.394A9.934 9.934 0 0 1 2 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+            <span>WhatsApp</span>
+          </button>
+          <button class="os-action" onclick="copyLink('${o.id}')" title="Copiar Link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Link</span>
+          </button>
+          <button class="os-action" onclick="editOS('${o.id}')" title="Editar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            <span>Editar</span>
+          </button>
+          <button class="os-action os-action--del" onclick="deleteOS('${o.id}')" title="Excluir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            <span>Excluir</span>
+          </button>
+        </div>
+      </div>`;
+    }
 
-    window.__cycleStatus = async (id) => {
-      const svc = services.find(s => s.id === id);
-      if (!svc) return;
-      const idx = STATUSES.indexOf(svc.status);
-      const next = STATUSES[(idx + 1) % STATUSES.length];
-      try {
-        const user = auth.currentUser;
-        if (user) await updateDoc(doc(db, 'users', user.uid, 'services', id), { status: next, updatedAt: serverTimestamp() });
-      } catch(e) { console.error('Status update error:', e); }
+    /* ── TABS ── */
+    window.switchTab = function(tab) {
+      currentTab = tab;
+      document.getElementById('tab-os').classList.toggle('active', tab==='os');
+      document.getElementById('tab-gar').classList.toggle('active', tab==='gar');
+      if(tab==='gar') window.location.href = 'warranty.html';
     };
 
-    window.__deleteOS = async (id) => {
-      if (!confirm('Excluir esta OS?')) return;
-      try {
-        const user = auth.currentUser;
-        if (user) await deleteDoc(doc(db, 'users', user.uid, 'services', id));
-      } catch(e) { console.error('Delete OS error:', e); }
+    /* ── MODAL OPEN/CLOSE ── */
+    window.btn_nova_os = null;
+    document.getElementById('btn-nova-os').onclick = () => openNewOS();
+
+    function openNewOS() {
+      editingId = null;
+      resetForm();
+      buildChecklist(CHECKLIST_DEFAULTS);
+      buildPatternGrid();
+      document.getElementById('os-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      startAutosave();
+    }
+
+    window.closeOSModal = function() {
+      document.getElementById('os-modal').classList.remove('open');
+      document.body.style.overflow = '';
+      clearTimeout(autosaveTimer);
     };
+
+    window.editOS = function(id) {
+      const o = orders.find(x=>x.id===id);
+      if(!o) return;
+      editingId = id;
+      resetForm();
+      // fill form
+      document.getElementById('f-client').value  = o.client||'';
+      document.getElementById('f-wa').value       = o.whatsapp||o.phone||'';
+      document.getElementById('f-device').value   = o.device||'';
+      document.getElementById('f-imei').value     = o.imei||'';
+      document.getElementById('f-obs').value      = o.observations||'';
+      document.getElementById('f-total').value    = o.total||o.price||0;
+      document.getElementById('f-status').value   = o.status||'fila';
+      document.getElementById('f-has-gar').checked = o.hasWarranty!==false;
+      // services
+      const svcs = Array.isArray(o.services)?o.services:[o.serviceType||''];
+      svcs.forEach(sv => {
+        const cb = document.querySelector(`#svc-dropdown-panel input[value="${sv}"]`);
+        if(cb) cb.checked = true;
+      });
+      updateSvcLabel();
+      // parts
+      parts = Array.isArray(o.parts) ? [...o.parts] : [];
+      renderParts();
+      // checklist
+      const chk = Array.isArray(o.checklist) ? o.checklist : CHECKLIST_DEFAULTS.map(n=>({name:n,checked:false}));
+      buildChecklist(null, chk);
+      buildPatternGrid();
+      document.getElementById('os-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.viewOS = function(id) { editOS(id); };
+
+    /* ── SAVE ── */
+    window.saveOS = async function() {
+      const client = document.getElementById('f-client').value.trim();
+      const device  = document.getElementById('f-device').value.trim();
+      if(!client || !device) { alert('Preencha Cliente e Aparelho.'); return; }
+
+      const svcs = [...document.querySelectorAll('#svc-dropdown-panel input[type=checkbox]:checked')].map(c=>c.value);
+      const checklist = getChecklist();
+      const patType = document.getElementById('f-pwd-type').value;
+      let pwdValue = patType==='pattern' ? patternSeq.join('-') : document.getElementById('f-pwd-value').value;
+
+      const data = {
+        client,
+        whatsapp: document.getElementById('f-wa').value.trim(),
+        device,
+        imei: document.getElementById('f-imei').value.trim(),
+        services: svcs.length ? svcs : ['Serviço'],
+        warrantyCategory: document.getElementById('f-gar-cat').value,
+        hasWarranty: document.getElementById('f-has-gar').checked,
+        observations: document.getElementById('f-obs').value.trim(),
+        password: { type: patType, value: pwdValue },
+        parts: parts,
+        total: parseFloat(document.getElementById('f-total').value)||0,
+        status: document.getElementById('f-status').value,
+        checklist,
+        updatedAt: serverTimestamp()
+      };
+
+      const btn = document.getElementById('os-save-btn');
+      btn.disabled = true; btn.textContent = 'Salvando...';
+
+      try {
+        if(editingId) {
+          await updateDoc(doc(db,'users',uid,'services',editingId), data);
+        } else {
+          osCounter++;
+          data.osNumber = osCounter;
+          data.createdAt = serverTimestamp();
+          await addDoc(colRef, data);
+          // update counter
+          try {
+            const { setDoc:sd, doc:d2 } = await import('../firebase-config.js');
+            await sd(d2(db,'users',uid,'settings','counters'), {osCounter}, {merge:true});
+          } catch(e){}
+        }
+        clearDraft();
+        closeOSModal();
+      } catch(err) {
+        alert('Erro ao salvar: ' + err.message);
+      }
+      btn.disabled = false; btn.textContent = 'Salvar O.S.';
+    };
+
+    /* ── DELETE ── */
+    window.deleteOS = async function(id) {
+      if(!confirm('Excluir esta OS permanentemente?')) return;
+      try { await deleteDoc(doc(db,'users',uid,'services',id)); }
+      catch(e){ alert('Erro: '+e.message); }
+    };
+
+    /* ── WHATSAPP ── */
+    window.openWA = function(id) {
+      const o = orders.find(x=>x.id===id);
+      if(!o) return;
+      const svcs = Array.isArray(o.services)?o.services.join(', '):(o.serviceType||'Serviço');
+      const stLabel = { fila:'NA FILA', bancada:'EM BANCADA', peca:'AGUARDANDO PEÇA', pronto:'PRONTO', entregue:'ENTREGUE' }[o.status]||o.status;
+      const msg = `*STATUS DO REPARO - SkyLabTec*\n\nOlá *${o.client||''}*,\nAparelho: *${o.device||''}* (OS #${o.osNumber||'—'})\n\n🔧 Status Atual: *${stLabel}*\n🛠 Serviço: ${svcs}\n💰 Total Estimado: R$ ${Number(o.total||0).toFixed(2).replace('.',',')}\n\nQualquer dúvida, estamos à disposição!`;
+      document.getElementById('wa-msg-text').textContent = msg;
+      const wa = o.whatsapp||o.phone||'';
+      document.getElementById('wa-to-label').textContent = wa ? `Para: +${wa}` : 'Para: —';
+      document.getElementById('wa-open-btn').onclick = () => {
+        if(wa) window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,'_blank');
+        else alert('Número de WhatsApp não cadastrado.');
+      };
+      document.getElementById('wa-copy-btn').onclick = () => {
+        navigator.clipboard.writeText(msg).then(()=>showToast('Mensagem copiada!'));
+      };
+      document.getElementById('wa-modal').classList.add('open');
+      document.body.style.overflow='hidden';
+    };
+
+    window.copyLink = function(id) {
+      const link = `${location.origin}/pages/warranty.html?os=${id}`;
+      navigator.clipboard.writeText(link).then(()=>showToast('Link copiado!'));
+    };
+
+    window.printOS = function(id) { window.print(); };
+
+    /* ── CHECKLIST ── */
+    function buildChecklist(names, existing) {
+      const wrap = document.getElementById('checklist-wrap');
+      const items = existing || (names||CHECKLIST_DEFAULTS).map(n=>({name:n,checked:false}));
+      wrap.innerHTML = items.map((item,i)=>`
+        <div class="checklist-item" id="chk-${i}">
+          <input type="radio" name="chk${i}" id="chkr${i}" ${item.checked?'checked':''} onchange="markCheck(${i})" />
+          <span class="checklist-item__name">${esc(typeof item==='string'?item:item.name)}</span>
+          <span class="checklist-item__status" id="chks${i}">${item.checked?'OK':'NÃO VERIFICADO'}</span>
+          <button class="checklist-item__rm" onclick="removeCheck(${i})" title="Remover">✕</button>
+        </div>
+      `).join('');
+    }
+    window.markCheck = function(i) {
+      const s = document.getElementById('chks'+i);
+      if(s) s.textContent = document.getElementById('chkr'+i).checked ? 'OK' : 'NÃO VERIFICADO';
+    };
+    window.removeCheck = function(i) {
+      document.getElementById('chk-'+i)?.remove();
+    };
+    window.addChecklistItem = function() {
+      const inp = document.getElementById('checklist-custom');
+      const val = inp.value.trim();
+      if(!val) return;
+      const wrap = document.getElementById('checklist-wrap');
+      const i = Date.now();
+      const div = document.createElement('div');
+      div.className = 'checklist-item'; div.id='chk-'+i;
+      div.innerHTML = `<input type="radio" name="chk${i}" id="chkr${i}" onchange="markCheck(${i})" /><span class="checklist-item__name">${esc(val)}</span><span class="checklist-item__status" id="chks${i}">NÃO VERIFICADO</span><button class="checklist-item__rm" onclick="removeCheck(${i})">✕</button>`;
+      wrap.appendChild(div);
+      inp.value='';
+    };
+    function getChecklist() {
+      return [...document.querySelectorAll('.checklist-item')].map(item=>{
+        return { name: item.querySelector('.checklist-item__name')?.textContent||'', checked: item.querySelector('input[type=radio]')?.checked||false };
+      });
+    }
+
+    /* ── PATTERN ── */
+    function buildPatternGrid() {
+      patternSeq = [];
+      const g = document.getElementById('pattern-grid');
+      g.innerHTML = [1,2,3,4,5,6,7,8,9].map(n=>`<div class="pattern-dot" id="pdot${n}" onclick="toggleDot(${n})">${n}</div>`).join('');
+    }
+    window.toggleDot = function(n) {
+      const d = document.getElementById('pdot'+n);
+      if(d.classList.contains('sel')){ patternSeq=patternSeq.filter(x=>x!==n); d.classList.remove('sel'); }
+      else { patternSeq.push(n); d.classList.add('sel'); }
+      document.getElementById('pattern-seq-label').textContent = patternSeq.length?patternSeq.join('-'):'—';
+    };
+    window.clearPattern = function() { patternSeq=[]; buildPatternGrid(); document.getElementById('pattern-seq-label').textContent='—'; };
+    window.onPwdTypeChange = function() {
+      const t = document.getElementById('f-pwd-type').value;
+      document.getElementById('pwd-value-wrap').style.display = (t==='pattern'||t==='none')?'none':'flex';
+      document.getElementById('pattern-wrap').style.display = t==='pattern'?'block':'none';
+    };
+    window.togglePwdVisible = function() {
+      const f = document.getElementById('f-pwd-value');
+      f.type = f.type==='password'?'text':'password';
+    };
+
+    /* ── SERVICE DROPDOWN ── */
+    window.toggleDropdown = function(id) {
+      const panel = document.getElementById(id+'-panel');
+      panel.classList.toggle('open');
+      document.addEventListener('click', function handler(e) {
+        if(!e.target.closest('#'+id)){panel.classList.remove('open');document.removeEventListener('click',handler);}
+      });
+    };
+    window.updateSvcLabel = function() {
+      const checked = [...document.querySelectorAll('#svc-dropdown-panel input[type=checkbox]:checked')].map(c=>c.value);
+      document.getElementById('svc-dropdown-label').textContent = checked.length ? checked.join(', ') : 'Selecione...';
+    };
+    window.addCustomSvc = function() {
+      const inp = document.getElementById('svc-custom-input');
+      const val = inp.value.trim(); if(!val) return;
+      const panel = document.getElementById('svc-dropdown-panel');
+      const addRow = panel.querySelector('.fdropdown-add');
+      const label = document.createElement('label');
+      label.className='fdropdown-opt';
+      label.innerHTML=`<input type="checkbox" value="${esc(val)}" onchange="updateSvcLabel()" checked> ${esc(val)}`;
+      panel.insertBefore(label, addRow);
+      inp.value=''; updateSvcLabel();
+    };
+
+    /* ── PARTS ── */
+    function renderInventoryDropdown() {
+      const panel = document.getElementById('parts-stock-dropdown-panel');
+      if(!inventoryItems.length) {
+        panel.innerHTML='<div class="fdropdown-opt" style="color:var(--text-3);cursor:default">Nenhuma peça no estoque</div>'; return;
+      }
+      panel.innerHTML = inventoryItems.map(item=>`
+        <div class="fdropdown-opt" onclick="addPartFromStock('${item.id}','${esc(item.name)}',${item.cost||0},${item.salePrice||0})">
+          ${esc(item.name)} <span style="margin-left:auto;font-size:.72rem;color:var(--blue-bright)">R$ ${(item.salePrice||0).toFixed(2)}</span>
+        </div>
+      `).join('');
+    }
+    window.addPartFromStock = function(id, name, cost, sale) {
+      parts.push({id, name, cost, sale, price: sale});
+      renderParts(); updateTotal();
+      document.getElementById('parts-stock-dropdown-panel').classList.remove('open');
+    };
+    window.addPart = function() {
+      const name = document.getElementById('f-part-name').value.trim();
+      if(!name) return;
+      const cost = parseFloat(document.getElementById('f-part-cost').value)||0;
+      const sale = parseFloat(document.getElementById('f-part-sale').value)||0;
+      parts.push({name, cost, sale, price: sale||cost});
+      renderParts(); updateTotal();
+      document.getElementById('f-part-name').value='';
+      document.getElementById('f-part-cost').value='';
+      document.getElementById('f-part-sale').value='';
+    };
+    window.removePart = function(i) {
+      parts.splice(i,1); renderParts(); updateTotal();
+    };
+    function renderParts() {
+      const el = document.getElementById('part-list');
+      if(!parts.length){el.innerHTML='';return;}
+      el.innerHTML = parts.map((p,i)=>`<div class="part-item"><span class="part-item__name">${esc(p.name)}</span><span class="part-item__price">R$ ${(p.price||0).toFixed(2)}</span><button class="part-item__rm" onclick="removePart(${i})">✕</button></div>`).join('');
+    }
+    function updateTotal() {
+      const sum = parts.reduce((a,p)=>a+(p.price||0),0);
+      const cur = parseFloat(document.getElementById('f-total').value)||0;
+      if(!cur || cur===0) document.getElementById('f-total').value = sum.toFixed(2);
+    }
+
+    /* ── GALLERY ── */
+    window.triggerFileInput = function(id) { document.getElementById(id).click(); };
+
+    /* ── RESET ── */
+    function resetForm() {
+      ['f-client','f-wa','f-device','f-imei','f-obs','f-pwd-value'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      document.getElementById('f-total').value='0';
+      document.getElementById('f-status').value='fila';
+      document.getElementById('f-has-gar').checked=true;
+      document.getElementById('f-pwd-type').value='pin';
+      document.getElementById('f-gar-cat').value='Serviço';
+      document.querySelectorAll('#svc-dropdown-panel input[type=checkbox]').forEach(c=>c.checked=false);
+      updateSvcLabel();
+      onPwdTypeChange();
+      parts=[];
+      renderParts();
+      document.getElementById('part-list').innerHTML='';
+    }
+
+    /* ── AUTOSAVE DRAFT ── */
+    function startAutosave() {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setInterval(()=>{
+        const data = {
+          client: document.getElementById('f-client').value,
+          device: document.getElementById('f-device').value,
+          ts: new Date().toISOString()
+        };
+        if(data.client||data.device) {
+          localStorage.setItem('skylab_os_draft', JSON.stringify(data));
+          showAutosave();
+        }
+      }, 8000);
+    }
+    function showAutosave() {
+      const el = document.getElementById('autosave-toast');
+      el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'),2500);
+    }
+    function checkDraft() {
+      const draft = localStorage.getItem('skylab_os_draft');
+      if(!draft) return;
+      const d = JSON.parse(draft);
+      if(d.client||d.device) {
+        const banner = document.getElementById('draft-banner');
+        banner.style.display='flex';
+        const dt = new Date(d.ts);
+        document.getElementById('draft-sub').textContent = `O.S. em preenchimento — ${dt.toLocaleDateString('pt-BR')}, ${dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+      }
+    }
+    window.continueDraft = function() {
+      const draft = JSON.parse(localStorage.getItem('skylab_os_draft')||'{}');
+      openNewOS();
+      if(draft.client) document.getElementById('f-client').value=draft.client;
+      if(draft.device) document.getElementById('f-device').value=draft.device;
+      document.getElementById('draft-banner').style.display='none';
+    };
+    window.discardDraft = function() {
+      clearDraft();
+      document.getElementById('draft-banner').style.display='none';
+    };
+    function clearDraft() { localStorage.removeItem('skylab_os_draft'); }
+
+    /* ── UTILS ── */
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.remove('open');
+      document.body.style.overflow='';
+    };
+    function showToast(msg) {
+      let t=document.createElement('div');
+      t.style.cssText='position:fixed;top:72px;right:16px;background:var(--emerald);color:#fff;padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:700;z-index:999;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+      t.textContent='✓ '+msg;
+      document.body.appendChild(t);
+      setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},2500);
+    }
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+    /* close modal on backdrop click */
+    document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('open');document.body.style.overflow=''}}));
   </script>
 </body>
 </html>
